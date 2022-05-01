@@ -115,9 +115,13 @@ class HandTest {
     @Test
     void compareStraightFlush() {
         Hand hand2 = new Hand(straightFlushPlayer1, straightFlushCommunity2);
+        Hand hand4 = new Hand(straightFlushPlayer1, straightFlushCommunity2);
         Hand hand3 = new Hand(straightFlushPlayer1, straightFlushCommunity3);
+        Hand hand5 = new Hand(straightFlushPlayer1, straightFlushCommunity3);
 
         assertTrue(hand2.compareTo(hand3) < 0);
+        assertTrue(hand2.compareTo(hand4) == 0);
+        assertTrue(hand3.compareTo(hand5) == 0);
     }
 
     @Test

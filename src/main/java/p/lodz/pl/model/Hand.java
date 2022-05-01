@@ -17,7 +17,6 @@ public class Hand implements Comparable<Hand> {
 
     private boolean evaluated = false;
 
-    // TODO change to private
     private boolean royalFlush;
     private boolean straightFlush;
     private boolean fourOfAKind;
@@ -124,15 +123,18 @@ public class Hand implements Comparable<Hand> {
             // next FLUSH_SIZE-1 cards must be one rank lower with the same suit
             for (int j = 1; j < FLUSH_SIZE; j++) {
 
+
+                // we will be checking next card, so we must check if the current card is not the last one in array
                 if ((i + 1) != cards.length) {
                     i++;
                 }
 
-
+                // checking if next card is one rank lower than current one and of the same suit
                 if ((currentRank.compareTo(cards[i].rank()) == -j) && cards[i].suit().equals(currentSuit)) {
                     cardsInFlush++;
                     if (cardsInFlush == FLUSH_SIZE) {
                         straightFlush = true;
+                        highCard = currentRank;
                         if (currentRank.equals(Ranks.values()[0])) {
                             royalFlush = true;
                         }
@@ -150,6 +152,7 @@ public class Hand implements Comparable<Hand> {
                     if (currentRank == Ranks.values()[Ranks.values().length - FLUSH_SIZE + 1]) {
                         // check if deck contains needed ace
                         if (Arrays.asList(cards).contains(new Card(Ranks.values()[0], currentSuit))) {
+                            highCard = currentRank;
                             straightFlush = true;
                             break;
                         }
@@ -157,6 +160,7 @@ public class Hand implements Comparable<Hand> {
 
 
                 } else {
+                    // if the straight does not continue, we go back one card
                     if ((i + 1) != cards.length) {
                         i--;
                     }
