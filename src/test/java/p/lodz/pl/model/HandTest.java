@@ -64,6 +64,22 @@ class HandTest {
             new Card(Ranks.Three, Suits.Clover)
     };
 
+    Card[] straightFlushCommunity3 = new Card[]{
+            new Card(Ranks.Two, Suits.Tiles),
+            new Card(Ranks.Three, Suits.Tiles),
+            new Card(Ranks.Four, Suits.Tiles),
+            new Card(Ranks.Five, Suits.Tiles),
+            new Card(Ranks.Six, Suits.Tiles)
+    };
+
+    Card[] straightFlushCommunity4 = new Card[]{
+            new Card(Ranks.Three, Suits.Pikes),
+            new Card(Ranks.Four, Suits.Pikes),
+            new Card(Ranks.Five, Suits.Pikes),
+            new Card(Ranks.Six, Suits.Pikes),
+            new Card(Ranks.Seven, Suits.Pikes)
+    };
+
     @Test
     void highCard() {
     }
@@ -97,24 +113,38 @@ class HandTest {
     }
 
     @Test
+    void compareStraightFlush() {
+        Hand hand2 = new Hand(straightFlushPlayer1, straightFlushCommunity2);
+        Hand hand3 = new Hand(straightFlushPlayer1, straightFlushCommunity3);
+
+        assertTrue(hand2.compareTo(hand3) < 0);
+    }
+
+    @Test
     void isStraightFlush() {
         Hand hand1 = new Hand(straightFlushPlayer1, straightFlushCommunity1);
         Hand hand2 = new Hand(straightFlushPlayer1, straightFlushCommunity2);
-        Hand hand4 = new Hand(royalFlushPlayer, royalFlushCommunity);
-        Hand hand5 = new Hand(royalFlushPlayer2, royalFlushCommunity2);
-        Hand hand6 = new Hand(royalFlushPlayer3, royalFlushCommunity3);
+        Hand hand3 = new Hand(straightFlushPlayer1, straightFlushCommunity3);
+        Hand hand4 = new Hand(straightFlushPlayer1, straightFlushCommunity4);
+        Hand hand5 = new Hand(royalFlushPlayer, royalFlushCommunity);
+        Hand hand6 = new Hand(royalFlushPlayer2, royalFlushCommunity2);
+        Hand hand7 = new Hand(royalFlushPlayer3, royalFlushCommunity3);
 
         hand1.evaluate();
         hand2.evaluate();
+        hand3.evaluate();
         hand4.evaluate();
         hand5.evaluate();
         hand6.evaluate();
+        hand7.evaluate();
 
         assertTrue(hand1.isStraightFlush());
         assertFalse(hand2.isStraightFlush());
+        assertTrue(hand3.isStraightFlush());
         assertTrue(hand4.isStraightFlush());
         assertTrue(hand5.isStraightFlush());
-        assertFalse(hand6.isStraightFlush());
+        assertTrue(hand6.isStraightFlush());
+        assertFalse(hand7.isStraightFlush());
     }
 
     @Test
