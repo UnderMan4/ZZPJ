@@ -9,7 +9,7 @@ public interface DEFS {
     int MIN_BET = 2;
 
     // DO NOT CHANGE UNLESS YOU ADD MORE CARDS TO THE GAME
-    int DECK_SIZE = 52;
+    int DECK_SIZE = Suits.values().length * Ranks.values().length;
 
     // cards needed for standard flush
     int FLUSH_SIZE = 5;

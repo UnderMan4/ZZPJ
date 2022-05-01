@@ -14,19 +14,35 @@ public class Hand implements Comparable<Hand> {
     private final RankComparator rankComparator = new RankComparator();
     private final Card[] cards;
 
+
+    private boolean evaluated = false;
+
     // TODO change to private
-    public Boolean royalFlush;
-    public Boolean straightFlush;
-    Boolean fourOfAKind;
-    Boolean fullHouse;
-    Boolean flush;
-    Boolean straight;
-    Boolean threeOfAKind;
-    Boolean twoPairs;
-    Boolean pair;
-    Ranks highCard;
+    private boolean royalFlush;
+    private boolean straightFlush;
+    private boolean fourOfAKind;
+    private boolean fullHouse;
+    private boolean flush;
+    private boolean straight;
+    private boolean threeOfAKind;
+    private boolean twoPairs;
+    private boolean pair;
+    // the highest card in current composition
+    // ex. highest card in straight
+    private Ranks highCard;
 
 
+    public boolean isRoyalFlush() {
+        return royalFlush;
+    }
+
+    public boolean isStraightFlush() {
+        return straightFlush;
+    }
+
+    public Ranks getHighCard() {
+        return highCard;
+    }
 
     public Hand(Card[] playerCards, Card[] tableCards) {
         cards = new Card[playerCards.length + tableCards.length];
@@ -89,82 +105,126 @@ public class Hand implements Comparable<Hand> {
         return false;
     }
 
-    // TODO
-    public boolean isStraightFlush() {
-        return false;
-    }
 
-
-    boolean isRoyalFlush() {
+    private void isRoyalFlushOrStraightFlush() {
         Arrays.sort(cards, suitRankComparator);
         Ranks[] ranks = Ranks.values();
         Suits currentSuit;
-        int cardsInRoyalFlush = 0;
+        Ranks currentRank;
+        int cardsInFlush = 0;
 
         int rankStartIndex = 0;
 
         // if there is a royal flush, cards will be next to each other after sorting
         for (int i = 0; i < cards.length; i++) {
-            // if the card is equal to the highest ranking card (Ace)
-            if (cards[i].rank().equals(ranks[0])) {
-                currentSuit = cards[i].suit();
-                cardsInRoyalFlush = 1;
+            currentSuit = cards[i].suit();
+            currentRank = cards[i].rank();
+            cardsInFlush = 1;
 
-                // next FLUSH_SIZE-1 cards must be one rank lower with the same suit
-                for (int j = 1; j < FLUSH_SIZE; j++) {
+            // next FLUSH_SIZE-1 cards must be one rank lower with the same suit
+            for (int j = 1; j < FLUSH_SIZE; j++) {
+
+                if ((i + 1) != cards.length) {
                     i++;
-
-                    if ((cards[i].rank().equals(ranks[j]) && cards[i].suit().equals(currentSuit))) {
-                        cardsInRoyalFlush++;
-                        if (cardsInRoyalFlush == FLUSH_SIZE) {
-                            return true;
-                        }
-                        // if it is the same rank and suit it means there is a duplicate card in flush and card is omitted
-                    } else if ((cards[i].rank().equals(ranks[j - 1]) && cards[i].suit().equals(currentSuit))) {
-                        j--;
-                    } else {
-                        break;
-                    }
                 }
 
+
+                if ((currentRank.compareTo(cards[i].rank()) == -j) && cards[i].suit().equals(currentSuit)) {
+                    cardsInFlush++;
+                    if (cardsInFlush == FLUSH_SIZE) {
+                        straightFlush = true;
+                        if (currentRank.equals(Ranks.values()[0])) {
+                            royalFlush = true;
+                        }
+                        break;
+                    }
+                    // if it is the same rank and suit it means there is a duplicate card in flush and card is omitted
+                } else if ((cards[i].rank().equals(ranks[j - 1]) && cards[i].suit().equals(currentSuit))) {
+                    j--;
+
+                    // (in normal poker) if the last card is ace ex. 5, 4, 3, 2, ace
+                    // if the last card in ranks is the last card in flush
+                } else if (cardsInFlush == FLUSH_SIZE - 1) {
+                    // check if straight is from last cards
+                    // (in normal poker) check if the flush starts from 5
+                    if (currentRank == Ranks.values()[Ranks.values().length - FLUSH_SIZE + 1]) {
+                        // check if deck contains needed ace
+                        if (Arrays.asList(cards).contains(new Card(Ranks.values()[0], currentSuit))) {
+                            straightFlush = true;
+                            break;
+                        }
+                    }
+
+
+                } else {
+                    if ((i + 1) != cards.length) {
+                        i--;
+                    }
+                    break;
+                }
             }
         }
-        return false;
     }
 
     public void evaluate() {
-        if (isRoyalFlush()) {
-            royalFlush = true;
-            straightFlush = true;
-            flush = true;
-            straight = true;
-            highCard = Ranks.values()[0];
-        } else {
-            royalFlush = false;
+        if (!evaluated) {
+            isRoyalFlushOrStraightFlush();
+            if (!royalFlush || !straightFlush) {
+                // TODO
+                evaluated = true;
+            }
 
+
+            evaluated = true;
         }
-        if (isStraightFlush()) {
-            straightFlush = true;
-            flush = true;
-            straight = true;
-        } else {
-            straightFlush = false;
-        }
-
-        // etc...
-
-        highCard = highCard();
     }
 
     @Override
     public int compareTo(Hand o) {
+        o.evaluate();
+        this.evaluate();
 
-        int compare = royalFlush.compareTo(o.royalFlush);
+        int compare = 0;
 
-        if (compare == 0) {
-            compare = straightFlush.compareTo(o.straightFlush);
-            //etc ..
+        // checking for royal flush
+        if (royalFlush ^ o.isRoyalFlush()) {
+
+            // either this or o is royalFlush
+            if (royalFlush) {
+                return 100;
+            } else {
+                return -100;
+            }
+
+            // either no royal flush on both hands or royal flush on both hands
+            // for possible modifications of this game, ex. more than 1 deck is used
+            // in such case there can be more than one royal flush
+        } else if (royalFlush) {
+            return 0;
         }
+
+        if (straightFlush ^ o.isStraightFlush()) {
+            // either this or o is straightFlush
+            if (straightFlush) {
+                return 50;
+            } else {
+                return -50;
+            }
+
+            // either no straight flush on both hands or straight flush on both hands
+        } else if (straightFlush) {
+            // in such case there can be more than one straight flush
+            // then winner is which flush starts from higher ranked card
+            if (this.getHighCard().compareTo(o.getHighCard()) > 0) {
+                return 50;
+            } else if (this.getHighCard().compareTo(o.getHighCard()) < 0) {
+                return -50;
+            } else {
+                return 0;
+            }
+        }
+
+        // not yet implemented
 
         return 0;
     }
