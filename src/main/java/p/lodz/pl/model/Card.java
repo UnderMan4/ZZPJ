@@ -5,7 +5,7 @@ import p.lodz.pl.comparators.RankComparator;
 
 import java.util.Objects;
 
-public record Card(Ranks rank, Suits suit) implements Comparable<Card>{
+public record Card(Ranks rank, Suits suit) implements Comparable<Card> {
 
     @Override
     public Ranks rank() {

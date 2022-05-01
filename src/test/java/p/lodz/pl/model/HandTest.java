@@ -2,22 +2,12 @@ package p.lodz.pl.model;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.ArrayList;
+import java.util.Collections;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class HandTest {
-
-
-
-    Card[] playerCards1 = new Card[]{new Card(Ranks.Two, Suits.Hearts), new Card(Ranks.Three, Suits.Hearts)};
-    Card[] playerCards2 = new Card[]{new Card(Ranks.King, Suits.Hearts), new Card(Ranks.Ace, Suits.Hearts)};
-    Card[] communityCards1 = new Card[]{
-            new Card(Ranks.King, Suits.Hearts),
-            new Card(Ranks.King, Suits.Clover),
-            new Card(Ranks.Queen, Suits.Pikes),
-            new Card(Ranks.King, Suits.Tiles),
-            new Card(Ranks.Ace, Suits.Hearts)
-    };
 
 
     Card[] royalFlushPlayer = new Card[]{new Card(Ranks.Ace, Suits.Clover), new Card(Ranks.Jack, Suits.Clover)};
@@ -47,7 +37,10 @@ class HandTest {
             new Card(Ranks.Nine, Suits.Clover)
     };
 
+
+
     Card[] straightFlushPlayer1 = new Card[]{new Card(Ranks.Ace, Suits.Clover), new Card(Ranks.Five, Suits.Clover)};
+    // straight flush 5,4,3,2,1 with player cards
     Card[] straightFlushCommunity1 = new Card[]{
             new Card(Ranks.Two, Suits.Clover),
             new Card(Ranks.King, Suits.Tiles),
@@ -56,29 +49,53 @@ class HandTest {
             new Card(Ranks.Three, Suits.Clover)
     };
 
+    // straight flush 5,4,3,2,1
     Card[] straightFlushCommunity2 = new Card[]{
-            new Card(Ranks.Five, Suits.Clover),
-            new Card(Ranks.King, Suits.Tiles),
-            new Card(Ranks.King, Suits.Hearts),
-            new Card(Ranks.Four, Suits.Clover),
-            new Card(Ranks.Three, Suits.Clover)
-    };
-
-    Card[] straightFlushCommunity3 = new Card[]{
+            new Card(Ranks.Ace, Suits.Tiles),
             new Card(Ranks.Two, Suits.Tiles),
             new Card(Ranks.Three, Suits.Tiles),
             new Card(Ranks.Four, Suits.Tiles),
-            new Card(Ranks.Five, Suits.Tiles),
-            new Card(Ranks.Six, Suits.Tiles)
+            new Card(Ranks.Five, Suits.Tiles)
     };
 
-    Card[] straightFlushCommunity4 = new Card[]{
+    // straight flush 7,6,5,4,3
+    Card[] straightFlushCommunity3 = new Card[]{
             new Card(Ranks.Three, Suits.Pikes),
             new Card(Ranks.Four, Suits.Pikes),
             new Card(Ranks.Five, Suits.Pikes),
             new Card(Ranks.Six, Suits.Pikes),
             new Card(Ranks.Seven, Suits.Pikes)
     };
+
+
+    Card[] fourOfAKindPlayer1 = new Card[]{new Card(Ranks.Two, Suits.Pikes), new Card(Ranks.Five, Suits.Clover)};
+    Card[] fourOfAKindPlayer2 = new Card[]{new Card(Ranks.Six, Suits.Pikes), new Card(Ranks.Five, Suits.Hearts)};
+
+    // non-traditional community cards 6 cards on table
+    Card[] fourOfAKindCommunity = new Card[]{
+            new Card(Ranks.Two, Suits.Tiles),
+            new Card(Ranks.Two, Suits.Hearts),
+            new Card(Ranks.Two, Suits.Clover),
+            new Card(Ranks.Six, Suits.Tiles),
+            new Card(Ranks.Six, Suits.Hearts),
+            new Card(Ranks.Six, Suits.Clover),
+    };
+
+
+    Card[] threeOfAKindPlayer1 = new Card[]{new Card(Ranks.Two, Suits.Pikes), new Card(Ranks.Nine, Suits.Clover)};
+    Card[] threeOfAKindPlayer2 = new Card[]{new Card(Ranks.Six, Suits.Pikes), new Card(Ranks.Eight, Suits.Hearts)};
+    Card[] threeOfAKindPlayer3 = new Card[]{new Card(Ranks.Ace, Suits.Pikes), new Card(Ranks.Eight, Suits.Hearts)};
+
+    // non-traditional community cards 6 cards on table
+    Card[] threeOfAKindCommunity = new Card[]{
+            new Card(Ranks.Two, Suits.Tiles),
+            new Card(Ranks.Two, Suits.Hearts),
+            new Card(Ranks.Ace, Suits.Clover),
+            new Card(Ranks.Ace, Suits.Tiles),
+            new Card(Ranks.Six, Suits.Tiles),
+            new Card(Ranks.Six, Suits.Hearts),
+    };
+
 
     @Test
     void highCard() {
@@ -94,6 +111,25 @@ class HandTest {
 
     @Test
     void isThreeOfAKind() {
+        // hand1 < hand2 < hand3
+        Hand hand1 = new Hand(threeOfAKindPlayer1, threeOfAKindCommunity);
+        Hand hand2 = new Hand(threeOfAKindPlayer2, threeOfAKindCommunity);
+        Hand hand3 = new Hand(threeOfAKindPlayer3, threeOfAKindCommunity);
+
+        ArrayList<Hand> hands = new ArrayList<Hand>();
+        hands.add(hand1);
+        hands.add(hand2);
+        hands.add(hand3);
+        Collections.sort(hands);
+
+        assertEquals(hand3, hands.get(0));
+
+        assertTrue(hand1.compareTo(hand2) > 0);
+        assertTrue(hand2.compareTo(hand3) > 0);
+        assertTrue(hand2.compareTo(hand1) < 0);
+        assertTrue(hand1.isThreeOfAKind());
+        assertTrue(hand2.isThreeOfAKind());
+        assertTrue(hand3.isThreeOfAKind());
     }
 
     @Test
@@ -110,18 +146,47 @@ class HandTest {
 
     @Test
     void isFourOfAKind() {
+
+        Hand hand1 = new Hand(fourOfAKindPlayer1, fourOfAKindCommunity);
+        Hand hand2 = new Hand(fourOfAKindPlayer2, fourOfAKindCommunity);
+
+        hand1.evaluate();
+        hand2.evaluate();
+
+        assertTrue(hand1.compareTo(hand2) > 0);
+        assertTrue(hand1.isFourOfAKind());
+        assertTrue(hand1.isThreeOfAKind());
+        assertTrue(hand2.isFourOfAKind());
+        assertTrue(hand2.isThreeOfAKind());
     }
 
     @Test
     void compareStraightFlush() {
+        // hand1 < hand2 < hand 3
+        Hand hand1 = new Hand(straightFlushPlayer1, straightFlushCommunity1);
         Hand hand2 = new Hand(straightFlushPlayer1, straightFlushCommunity2);
-        Hand hand4 = new Hand(straightFlushPlayer1, straightFlushCommunity2);
         Hand hand3 = new Hand(straightFlushPlayer1, straightFlushCommunity3);
-        Hand hand5 = new Hand(straightFlushPlayer1, straightFlushCommunity3);
+        Hand hand11 = new Hand(straightFlushPlayer1, straightFlushCommunity1);
+        Hand hand22 = new Hand(straightFlushPlayer1, straightFlushCommunity2);
+        Hand hand33 = new Hand(straightFlushPlayer1, straightFlushCommunity3);
 
-        assertTrue(hand2.compareTo(hand3) < 0);
-        assertTrue(hand2.compareTo(hand4) == 0);
-        assertTrue(hand3.compareTo(hand5) == 0);
+
+        ArrayList<Hand> hands = new ArrayList<Hand>();
+        hands.add(hand1);
+        hands.add(hand2);
+        hands.add(hand3);
+        Collections.sort(hands);
+
+        assertEquals(hands.get(0), hand3);
+
+        assertEquals(0, hand1.compareTo(hand11));
+        assertEquals(0, hand2.compareTo(hand22));
+        assertEquals(0, hand3.compareTo(hand33));
+
+
+        assertTrue(hand1.compareTo(hand3) > 0);
+        assertTrue(hand2.compareTo(hand3) > 0);
+        assertEquals(0, hand1.compareTo(hand2));
     }
 
     @Test
@@ -129,7 +194,6 @@ class HandTest {
         Hand hand1 = new Hand(straightFlushPlayer1, straightFlushCommunity1);
         Hand hand2 = new Hand(straightFlushPlayer1, straightFlushCommunity2);
         Hand hand3 = new Hand(straightFlushPlayer1, straightFlushCommunity3);
-        Hand hand4 = new Hand(straightFlushPlayer1, straightFlushCommunity4);
         Hand hand5 = new Hand(royalFlushPlayer, royalFlushCommunity);
         Hand hand6 = new Hand(royalFlushPlayer2, royalFlushCommunity2);
         Hand hand7 = new Hand(royalFlushPlayer3, royalFlushCommunity3);
@@ -137,15 +201,14 @@ class HandTest {
         hand1.evaluate();
         hand2.evaluate();
         hand3.evaluate();
-        hand4.evaluate();
         hand5.evaluate();
         hand6.evaluate();
         hand7.evaluate();
 
         assertTrue(hand1.isStraightFlush());
-        assertFalse(hand2.isStraightFlush());
+        assertTrue(hand2.isStraightFlush());
         assertTrue(hand3.isStraightFlush());
-        assertTrue(hand4.isStraightFlush());
+
         assertTrue(hand5.isStraightFlush());
         assertTrue(hand6.isStraightFlush());
         assertFalse(hand7.isStraightFlush());
@@ -166,6 +229,6 @@ class HandTest {
         assertFalse(hand3.isRoyalFlush());
 
 
-        // assertEquals(0, hand1.compareTo(hand2));
+         assertEquals(0, hand1.compareTo(hand2));
     }
 }

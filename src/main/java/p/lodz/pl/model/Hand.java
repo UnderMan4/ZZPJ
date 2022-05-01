@@ -4,7 +4,9 @@ import p.lodz.pl.comparators.RankComparator;
 import p.lodz.pl.comparators.SuitComparator;
 import p.lodz.pl.comparators.SuitRankComparator;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 import static p.lodz.pl.model.DEFS.FLUSH_SIZE;
 
@@ -31,6 +33,22 @@ public class Hand implements Comparable<Hand> {
     private Ranks highCard;
 
 
+    public Hand(Card[] playerCards, Card[] tableCards) {
+        cards = new Card[playerCards.length + tableCards.length];
+        System.arraycopy(playerCards, 0, cards, 0, playerCards.length);
+        System.arraycopy(tableCards, 0, cards, playerCards.length, tableCards.length);
+        Arrays.sort(cards);
+    }
+
+    public Hand(Card[]... cardArrays) {
+        ArrayList<Card> cardList = new ArrayList<Card>();
+        for (Card[] cards :
+                cardArrays) {
+            Collections.addAll(cardList, cards);
+        }
+        cards = cardList.toArray(new Card[0]);
+    }
+
     public boolean isRoyalFlush() {
         return royalFlush;
     }
@@ -39,15 +57,32 @@ public class Hand implements Comparable<Hand> {
         return straightFlush;
     }
 
-    public Ranks getHighCard() {
-        return highCard;
+    public boolean isFourOfAKind() {
+        return fourOfAKind;
     }
 
-    public Hand(Card[] playerCards, Card[] tableCards) {
-        cards = new Card[playerCards.length + tableCards.length];
-        System.arraycopy(playerCards, 0, cards, 0, playerCards.length);
-        System.arraycopy(tableCards, 0, cards, playerCards.length, tableCards.length);
-        Arrays.sort(cards);
+    public boolean isFullHouse() {
+        return fullHouse;
+    }
+
+    public boolean isFlush() {
+        return flush;
+    }
+
+    public boolean isStraight() {
+        return straight;
+    }
+
+    public boolean isThreeOfAKind() {
+        return threeOfAKind;
+    }
+
+    public boolean isTwoPairs() {
+        return twoPairs;
+    }
+
+    public Ranks getHighCard() {
+        return highCard;
     }
 
     public Card[] getCards() {
@@ -68,48 +103,72 @@ public class Hand implements Comparable<Hand> {
     }
 
     // TODO
-    public boolean isPair() {
+    private boolean isPair() {
         return false;
     }
 
     // TODO
-    public boolean isTwoPairs() {
+    private boolean checkIfTwoPairs() {
+        return false;
+    }
+
+
+    // TODO
+    private boolean checkIfStraight() {
         return false;
     }
 
     // TODO
-    public boolean isThreeOfAKind() {
-        return false;
-    }
-
-    // TODO
-    public boolean isStraight() {
-        return false;
-    }
-
-    // TODO
-    public boolean isFlush() {
+    private boolean checkIfFlush() {
         Arrays.sort(cards, suitComparator);
 
         return false;
     }
 
     // TODO
-    public boolean isFullHouse() {
+    private boolean checkIfFullHouse() {
         return false;
     }
 
-    // TODO
-    public boolean isFourOfAKind() {
-        return false;
+    // check if hand contains ThreeOfAKind or FourOfAKind
+    // both assumptions are checked together for optimization
+    private void checkIfThreeOrFourOfAKind() {
+        Arrays.sort(cards, rankComparator);
+        int cardsInFourOfAKind = 1;
+        highCard = cards[0].rank();
+        Ranks threeOfAKindRank = highCard;
+
+        for (int i = 1; i < cards.length; i++) {
+
+            if (cards[i].rank().equals(highCard)) {
+                cardsInFourOfAKind++;
+                if (cardsInFourOfAKind == 3) {
+                    threeOfAKind = true;
+                    threeOfAKindRank = highCard;
+                }
+                if (cardsInFourOfAKind == 4) {
+                    fourOfAKind = true;
+                    return;
+                }
+            } else {
+                cardsInFourOfAKind = 1;
+                highCard = cards[i].rank();
+            }
+        }
+        fourOfAKind = false;
+
+        // if hand does not contain four of a kind, saved high card from threeOfAKind is brought back
+        if (threeOfAKind) {
+            highCard = threeOfAKindRank;
+        }
+
     }
 
 
-    private void isRoyalFlushOrStraightFlush() {
+    private void checkIfRoyalFlushOrStraightFlush() {
         Arrays.sort(cards, suitRankComparator);
         Ranks[] ranks = Ranks.values();
         Suits currentSuit;
-        Ranks currentRank;
         int cardsInFlush = 0;
 
         int rankStartIndex = 0;
@@ -117,7 +176,7 @@ public class Hand implements Comparable<Hand> {
         // if there is a royal flush, cards will be next to each other after sorting
         for (int i = 0; i < cards.length; i++) {
             currentSuit = cards[i].suit();
-            currentRank = cards[i].rank();
+            highCard = cards[i].rank();
             cardsInFlush = 1;
 
             // next FLUSH_SIZE-1 cards must be one rank lower with the same suit
@@ -130,12 +189,11 @@ public class Hand implements Comparable<Hand> {
                 }
 
                 // checking if next card is one rank lower than current one and of the same suit
-                if ((currentRank.compareTo(cards[i].rank()) == -j) && cards[i].suit().equals(currentSuit)) {
+                if ((highCard.compareTo(cards[i].rank()) == -j) && cards[i].suit().equals(currentSuit)) {
                     cardsInFlush++;
                     if (cardsInFlush == FLUSH_SIZE) {
                         straightFlush = true;
-                        highCard = currentRank;
-                        if (currentRank.equals(Ranks.values()[0])) {
+                        if (highCard.equals(ranks[0])) {
                             royalFlush = true;
                         }
                         break;
@@ -149,10 +207,9 @@ public class Hand implements Comparable<Hand> {
                 } else if (cardsInFlush == FLUSH_SIZE - 1) {
                     // check if straight is from last cards
                     // (in normal poker) check if the flush starts from 5
-                    if (currentRank == Ranks.values()[Ranks.values().length - FLUSH_SIZE + 1]) {
+                    if (highCard == ranks[ranks.length - FLUSH_SIZE + 1]) {
                         // check if deck contains needed ace
-                        if (Arrays.asList(cards).contains(new Card(Ranks.values()[0], currentSuit))) {
-                            highCard = currentRank;
+                        if (Arrays.asList(cards).contains(new Card(ranks[0], currentSuit))) {
                             straightFlush = true;
                             break;
                         }
@@ -170,17 +227,29 @@ public class Hand implements Comparable<Hand> {
         }
     }
 
+    /**
+     * evaluate each possible combination
+     * evaluation stops when certain combination is reached
+     * ex. if a hand contains straight flush other lower combinations are not calculated
+     */
     public void evaluate() {
         if (!evaluated) {
-            isRoyalFlushOrStraightFlush();
+            checkIfRoyalFlushOrStraightFlush();
             if (!royalFlush || !straightFlush) {
-                // TODO
-                evaluated = true;
+                checkIfThreeOrFourOfAKind();
+                if (!fourOfAKind) {
+                    // more logic
+                }
+
             }
 
 
             evaluated = true;
         }
+    }
+
+    private int compareHighCards(Hand o) {
+        return Integer.compare(this.getHighCard().compareTo(o.getHighCard()), 0);
     }
 
     @Override
@@ -210,25 +279,58 @@ public class Hand implements Comparable<Hand> {
         if (straightFlush ^ o.isStraightFlush()) {
             // either this or o is straightFlush
             if (straightFlush) {
-                return 50;
+                return 1;
             } else {
-                return -50;
+                return -1;
             }
 
-            // either no straight flush on both hands or straight flush on both hands
+            // either no straight flush in both hands or straight flush in both hands
         } else if (straightFlush) {
             // in such case there can be more than one straight flush
             // then winner is which flush starts from higher ranked card
-            if (this.getHighCard().compareTo(o.getHighCard()) > 0) {
-                return 50;
-            } else if (this.getHighCard().compareTo(o.getHighCard()) < 0) {
-                return -50;
-            } else {
-                return 0;
-            }
+            return compareHighCards(o);
         }
 
-        // not yet implemented
+        // checking for four of a kind
+        if (fourOfAKind ^ o.isFourOfAKind()) {
+
+            // either this or o is fourOfAKind
+            if (fourOfAKind) {
+                return 1;
+            } else {
+                return -1;
+            }
+            // either no four of a kind in both hands or four of a kind in both hands
+            // in such case there can be more than one four of a kind
+        } else if (fourOfAKind) {
+            // in such case there can be more than one four of a kind flush
+            // then winner is which four of a kind that starts from higher ranked card
+            return compareHighCards(o);
+        }
+
+        // fullhouse
+
+        // flush
+
+        // straight
+
+
+        // checking for three of a kind
+        if (threeOfAKind ^ o.isThreeOfAKind()) {
+
+            // either this or o is fourOfAKind
+            if (threeOfAKind) {
+                return 1;
+            } else {
+                return -1;
+            }
+            // either no four of a kind in both hands or four of a kind in both hands
+            // in such case there can be more than one four of a kind
+        } else if (threeOfAKind) {
+            // in such case there can be more than one four of a kind flush
+            // then winner is which four of a kind that starts from higher ranked card
+            return compareHighCards(o);
+        }
 
         return 0;
     }
