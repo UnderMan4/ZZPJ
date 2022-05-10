@@ -1,2 +1,5 @@
-rootProject.name = 'ZZPJ'
+rootProject.name = 'Discord Poker Bot'
+
+include 'discord-bot'
+include 'poker-logic'
 
