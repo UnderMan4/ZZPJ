@@ -4,11 +4,13 @@ import p.lodz.pl.exceptions.NoCardsInDeck;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import static p.lodz.pl.model.DEFS.DECK_SIZE;
 
-public class Deck {
+public class Deck  {
     private final ArrayList<Card> cardDeck;
+
 
     public Deck() {
         cardDeck = new ArrayList<Card>(DECK_SIZE);
@@ -19,7 +21,9 @@ public class Deck {
                 cardDeck.add(new Card(rank, suit));
             }
         }
-        Collections.shuffle(cardDeck);
+        for(int i = 0; i < 3; i++) {
+            Collections.shuffle(cardDeck);
+        }
     }
 
     public ArrayList<Card> getCardDeck() {

@@ -45,3 +45,6 @@ gradle-app.setting
 .classpath
 
 .idea
+
+# .env file
+.env
