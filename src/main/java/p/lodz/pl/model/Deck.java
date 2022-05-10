@@ -11,7 +11,6 @@ import static p.lodz.pl.model.DEFS.DECK_SIZE;
 public class Deck  {
     private final ArrayList<Card> cardDeck;
 
-
     public Deck() {
         cardDeck = new ArrayList<Card>(DECK_SIZE);
         for (Suits suit :
