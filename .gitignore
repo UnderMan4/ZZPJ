@@ -48,3 +48,4 @@ gradle-app.setting
 
 # .env file
 discord-bot/.env
+.env

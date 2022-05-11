@@ -9,7 +9,7 @@ package p.lodz.pl.logic.model;
  */
 public enum Suits {
     Hearts,
-    Tiles,
-    Clover,
-    Pikes
+    Diamonds,
+    Clubs,
+    Spades
 }

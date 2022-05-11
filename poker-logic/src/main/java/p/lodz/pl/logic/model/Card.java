@@ -1,6 +1,7 @@
 package p.lodz.pl.logic.model;
 
 
+import lombok.Getter;
 import p.lodz.pl.logic.comparators.RankComparator;
 
 import java.util.Objects;
@@ -40,4 +41,6 @@ public record Card(Ranks rank, Suits suit) implements Comparable<Card> {
         RankComparator rankComparator = new RankComparator();
         return rankComparator.compare(this, o);
     }
+    
+    
 }
