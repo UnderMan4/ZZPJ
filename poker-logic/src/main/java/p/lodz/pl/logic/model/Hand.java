@@ -19,7 +19,6 @@ public class Hand implements Comparable<Hand> {
 
     private boolean evaluated = false;
 
-    private boolean royalFlush;
     private boolean straightFlush;
     private boolean fourOfAKind;
     private boolean fullHouse;
@@ -50,7 +49,7 @@ public class Hand implements Comparable<Hand> {
     }
 
     public boolean isRoyalFlush() {
-        return royalFlush;
+        return isStraightFlush() && highCard.equals(Ranks.values()[0]);
     }
 
     public boolean isStraightFlush() {
@@ -165,7 +164,7 @@ public class Hand implements Comparable<Hand> {
     }
 
 
-    private void checkIfRoyalFlushOrStraightFlush() {
+    private void checkIfStraightFlush() {
         Arrays.sort(cards, suitRankComparator);
         Ranks[] ranks = Ranks.values();
         Suits currentSuit;
@@ -173,7 +172,7 @@ public class Hand implements Comparable<Hand> {
 
         int rankStartIndex = 0;
 
-        // if there is a royal flush, cards will be next to each other after sorting
+        // if there is a straight flush, cards will be next to each other after sorting
         for (int i = 0; i < cards.length; i++) {
             currentSuit = cards[i].suit();
             highCard = cards[i].rank();
@@ -193,10 +192,7 @@ public class Hand implements Comparable<Hand> {
                     cardsInFlush++;
                     if (cardsInFlush == FLUSH_SIZE) {
                         straightFlush = true;
-                        if (highCard.equals(ranks[0])) {
-                            royalFlush = true;
-                        }
-                        break;
+                        return;
                     }
                     // if it is the same rank and suit it means there is a duplicate card in flush and card is omitted
                 } else if ((cards[i].rank().equals(ranks[j - 1]) && cards[i].suit().equals(currentSuit))) {
@@ -234,8 +230,8 @@ public class Hand implements Comparable<Hand> {
      */
     public void evaluate() {
         if (!evaluated) {
-            checkIfRoyalFlushOrStraightFlush();
-            if (!royalFlush || !straightFlush) {
+            checkIfStraightFlush();
+            if (!straightFlush) {
                 checkIfThreeOrFourOfAKind();
                 if (!fourOfAKind) {
                     // more logic
@@ -258,23 +254,6 @@ public class Hand implements Comparable<Hand> {
         this.evaluate();
 
         int compare = 0;
-
-        // checking for royal flush
-        if (royalFlush ^ o.isRoyalFlush()) {
-
-            // either this or o is royalFlush
-            if (royalFlush) {
-                return 100;
-            } else {
-                return -100;
-            }
-
-            // either no royal flush on both hands or royal flush on both hands
-            // for possible modifications of this game, ex. more than 1 deck is used
-            // in such case there can be more than one royal flush
-        } else if (royalFlush) {
-            return 0;
-        }
 
         if (straightFlush ^ o.isStraightFlush()) {
             // either this or o is straightFlush
