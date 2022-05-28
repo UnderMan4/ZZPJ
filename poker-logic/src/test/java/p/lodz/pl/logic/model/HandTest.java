@@ -11,89 +11,89 @@ import static org.junit.jupiter.api.Assertions.*;
 class HandTest {
 
 
-    Card[] royalFlushPlayer = new Card[]{new Card(Ranks.Ace, Suits.Clover), new Card(Ranks.Jack, Suits.Clover)};
+    Card[] royalFlushPlayer = new Card[]{new Card(Ranks.Ace, Suits.Clubs), new Card(Ranks.Jack, Suits.Clubs)};
     Card[] royalFlushCommunity = new Card[]{
-            new Card(Ranks.Queen, Suits.Clover),
-            new Card(Ranks.King, Suits.Clover),
-            new Card(Ranks.Queen, Suits.Clover),
-            new Card(Ranks.King, Suits.Clover),
-            new Card(Ranks.Ten, Suits.Clover)
+            new Card(Ranks.Queen, Suits.Clubs),
+            new Card(Ranks.King, Suits.Clubs),
+            new Card(Ranks.Queen, Suits.Clubs),
+            new Card(Ranks.King, Suits.Clubs),
+            new Card(Ranks.Ten, Suits.Clubs)
     };
 
-    Card[] royalFlushPlayer2 = new Card[]{new Card(Ranks.Ace, Suits.Clover), new Card(Ranks.Jack, Suits.Clover)};
+    Card[] royalFlushPlayer2 = new Card[]{new Card(Ranks.Ace, Suits.Clubs), new Card(Ranks.Jack, Suits.Clubs)};
     Card[] royalFlushCommunity2 = new Card[]{
-            new Card(Ranks.Queen, Suits.Clover),
-            new Card(Ranks.King, Suits.Tiles),
+            new Card(Ranks.Queen, Suits.Clubs),
+            new Card(Ranks.King, Suits.Diamonds),
             new Card(Ranks.King, Suits.Hearts),
-            new Card(Ranks.King, Suits.Clover),
-            new Card(Ranks.Ten, Suits.Clover)
+            new Card(Ranks.King, Suits.Clubs),
+            new Card(Ranks.Ten, Suits.Clubs)
     };
 
-    Card[] royalFlushPlayer3 = new Card[]{new Card(Ranks.Ace, Suits.Clover), new Card(Ranks.Jack, Suits.Clover)};
+    Card[] royalFlushPlayer3 = new Card[]{new Card(Ranks.Ace, Suits.Clubs), new Card(Ranks.Jack, Suits.Clubs)};
     Card[] royalFlushCommunity3 = new Card[]{
-            new Card(Ranks.Queen, Suits.Clover),
-            new Card(Ranks.King, Suits.Tiles),
+            new Card(Ranks.Queen, Suits.Clubs),
+            new Card(Ranks.King, Suits.Diamonds),
             new Card(Ranks.King, Suits.Hearts),
-            new Card(Ranks.King, Suits.Clover),
-            new Card(Ranks.Nine, Suits.Clover)
+            new Card(Ranks.King, Suits.Clubs),
+            new Card(Ranks.Nine, Suits.Clubs)
     };
 
 
 
-    Card[] straightFlushPlayer1 = new Card[]{new Card(Ranks.Ace, Suits.Clover), new Card(Ranks.Five, Suits.Clover)};
+    Card[] straightFlushPlayer1 = new Card[]{new Card(Ranks.Ace, Suits.Clubs), new Card(Ranks.Five, Suits.Clubs)};
     // straight flush 5,4,3,2,1 with player cards
     Card[] straightFlushCommunity1 = new Card[]{
-            new Card(Ranks.Two, Suits.Clover),
-            new Card(Ranks.King, Suits.Tiles),
+            new Card(Ranks.Two, Suits.Clubs),
+            new Card(Ranks.King, Suits.Diamonds),
             new Card(Ranks.King, Suits.Hearts),
-            new Card(Ranks.Four, Suits.Clover),
-            new Card(Ranks.Three, Suits.Clover)
+            new Card(Ranks.Four, Suits.Clubs),
+            new Card(Ranks.Three, Suits.Clubs)
     };
 
     // straight flush 5,4,3,2,1
     Card[] straightFlushCommunity2 = new Card[]{
-            new Card(Ranks.Ace, Suits.Tiles),
-            new Card(Ranks.Two, Suits.Tiles),
-            new Card(Ranks.Three, Suits.Tiles),
-            new Card(Ranks.Four, Suits.Tiles),
-            new Card(Ranks.Five, Suits.Tiles)
+            new Card(Ranks.Ace, Suits.Diamonds),
+            new Card(Ranks.Two, Suits.Diamonds),
+            new Card(Ranks.Three, Suits.Diamonds),
+            new Card(Ranks.Four, Suits.Diamonds),
+            new Card(Ranks.Five, Suits.Diamonds)
     };
 
     // straight flush 7,6,5,4,3
     Card[] straightFlushCommunity3 = new Card[]{
-            new Card(Ranks.Three, Suits.Pikes),
-            new Card(Ranks.Four, Suits.Pikes),
-            new Card(Ranks.Five, Suits.Pikes),
-            new Card(Ranks.Six, Suits.Pikes),
-            new Card(Ranks.Seven, Suits.Pikes)
+            new Card(Ranks.Three, Suits.Spades),
+            new Card(Ranks.Four, Suits.Spades),
+            new Card(Ranks.Five, Suits.Spades),
+            new Card(Ranks.Six, Suits.Spades),
+            new Card(Ranks.Seven, Suits.Spades)
     };
 
 
-    Card[] fourOfAKindPlayer1 = new Card[]{new Card(Ranks.Two, Suits.Pikes), new Card(Ranks.Five, Suits.Clover)};
-    Card[] fourOfAKindPlayer2 = new Card[]{new Card(Ranks.Six, Suits.Pikes), new Card(Ranks.Five, Suits.Hearts)};
+    Card[] fourOfAKindPlayer1 = new Card[]{new Card(Ranks.Two, Suits.Spades), new Card(Ranks.Five, Suits.Clubs)};
+    Card[] fourOfAKindPlayer2 = new Card[]{new Card(Ranks.Six, Suits.Spades), new Card(Ranks.Five, Suits.Hearts)};
 
     // non-traditional community cards 6 cards on table
     Card[] fourOfAKindCommunity = new Card[]{
-            new Card(Ranks.Two, Suits.Tiles),
+            new Card(Ranks.Two, Suits.Diamonds),
             new Card(Ranks.Two, Suits.Hearts),
-            new Card(Ranks.Two, Suits.Clover),
-            new Card(Ranks.Six, Suits.Tiles),
+            new Card(Ranks.Two, Suits.Clubs),
+            new Card(Ranks.Six, Suits.Diamonds),
             new Card(Ranks.Six, Suits.Hearts),
-            new Card(Ranks.Six, Suits.Clover),
+            new Card(Ranks.Six, Suits.Clubs),
     };
 
 
-    Card[] threeOfAKindPlayer1 = new Card[]{new Card(Ranks.Two, Suits.Pikes), new Card(Ranks.Nine, Suits.Clover)};
-    Card[] threeOfAKindPlayer2 = new Card[]{new Card(Ranks.Six, Suits.Pikes), new Card(Ranks.Eight, Suits.Hearts)};
-    Card[] threeOfAKindPlayer3 = new Card[]{new Card(Ranks.Ace, Suits.Pikes), new Card(Ranks.Eight, Suits.Hearts)};
+    Card[] threeOfAKindPlayer1 = new Card[]{new Card(Ranks.Two, Suits.Spades), new Card(Ranks.Nine, Suits.Clubs)};
+    Card[] threeOfAKindPlayer2 = new Card[]{new Card(Ranks.Six, Suits.Spades), new Card(Ranks.Eight, Suits.Hearts)};
+    Card[] threeOfAKindPlayer3 = new Card[]{new Card(Ranks.Ace, Suits.Spades), new Card(Ranks.Eight, Suits.Hearts)};
 
     // non-traditional community cards 6 cards on table
     Card[] threeOfAKindCommunity = new Card[]{
-            new Card(Ranks.Two, Suits.Tiles),
+            new Card(Ranks.Two, Suits.Diamonds),
             new Card(Ranks.Two, Suits.Hearts),
-            new Card(Ranks.Ace, Suits.Clover),
-            new Card(Ranks.Ace, Suits.Tiles),
-            new Card(Ranks.Six, Suits.Tiles),
+            new Card(Ranks.Ace, Suits.Clubs),
+            new Card(Ranks.Ace, Suits.Diamonds),
+            new Card(Ranks.Six, Suits.Diamonds),
             new Card(Ranks.Six, Suits.Hearts),
     };
 
