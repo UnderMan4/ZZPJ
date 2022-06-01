@@ -1,7 +1,7 @@
 package p.lodz.pl.logic.model;
 
 
-import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 import p.lodz.pl.logic.comparators.RankComparator;
 
 import java.util.Objects;
@@ -20,7 +20,7 @@ public record Card(Ranks rank, Suits suit) implements Comparable<Card> {
 
     @Override
     public String toString() {
-        return "Card: " + rank + " of " + suit;
+        return "Card: " + rank + " of " + suit + "\n";
     }
 
     @Override
@@ -37,7 +37,7 @@ public record Card(Ranks rank, Suits suit) implements Comparable<Card> {
     }
 
     @Override
-    public int compareTo(Card o) {
+    public int compareTo(@NotNull Card o) {
         RankComparator rankComparator = new RankComparator();
         return rankComparator.compare(this, o);
     }
