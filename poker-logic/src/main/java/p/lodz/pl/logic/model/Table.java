@@ -1,6 +1,7 @@
 package p.lodz.pl.logic.model;
 
 import p.lodz.pl.logic.exceptions.CannotJoinGame;
+import p.lodz.pl.logic.exceptions.NoCardsInDeck;
 
 import java.util.ArrayList;
 
@@ -15,10 +16,10 @@ public class Table {
 
 
     public Table() {
-        startGame();
+        initGame();
     }
 
-    public void startGame() {
+    public void initGame() {
         deck = new Deck();
         currentBet = 0;
         playersList.clear();
@@ -34,5 +35,29 @@ public class Table {
         } else {
             throw new CannotJoinGame("Maximum amount of players in the game");
         }
+    }
+    
+    public void startGame() {
+        if(playersList.size() > 1) {
+            for (Player player: playersList
+                 ) {
+                try {
+                    for (int i = 0; i < 2; i++) {
+                        Card card = deck.draw();
+                        player.addPlayerCard(card);
+                    }
+                } catch (NoCardsInDeck e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "Table{" +
+                "playersList=" + playersList +
+                ", currentBet=" + currentBet +
+                '}';
     }
 }
