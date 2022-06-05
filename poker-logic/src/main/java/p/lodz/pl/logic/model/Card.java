@@ -20,7 +20,7 @@ public record Card(Ranks rank, Suits suit) implements Comparable<Card> {
 
     @Override
     public String toString() {
-        return "Card: " + rank + " of " + suit + "\n";
+        return "\nCard: " + rank + " of " + suit;
     }
 
     @Override

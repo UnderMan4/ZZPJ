@@ -83,17 +83,14 @@ class HandTest {
     };
 
 
-    Card[] threeOfAKindPlayer1 = new Card[]{new Card(Ranks.Two, Suits.Spades), new Card(Ranks.Nine, Suits.Clubs)};
-    Card[] threeOfAKindPlayer2 = new Card[]{new Card(Ranks.Six, Suits.Spades), new Card(Ranks.Eight, Suits.Hearts)};
-    Card[] threeOfAKindPlayer3 = new Card[]{new Card(Ranks.Ace, Suits.Spades), new Card(Ranks.Eight, Suits.Hearts)};
+    Card[] threeOfAKindPlayer1 = new Card[]{new Card(Ranks.Two, Suits.Spades), new Card(Ranks.Two, Suits.Clubs)};
+    Card[] threeOfAKindPlayer2 = new Card[]{new Card(Ranks.Six, Suits.Spades), new Card(Ranks.Six, Suits.Hearts)};
+    Card[] threeOfAKindPlayer3 = new Card[]{new Card(Ranks.Ace, Suits.Spades), new Card(Ranks.Ace, Suits.Hearts)};
 
     // non-traditional community cards 6 cards on table
     Card[] threeOfAKindCommunity = new Card[]{
             new Card(Ranks.Two, Suits.Diamonds),
-            new Card(Ranks.Two, Suits.Hearts),
-            new Card(Ranks.Ace, Suits.Clubs),
             new Card(Ranks.Ace, Suits.Diamonds),
-            new Card(Ranks.Six, Suits.Diamonds),
             new Card(Ranks.Six, Suits.Hearts),
     };
 
@@ -117,17 +114,21 @@ class HandTest {
         Hand hand2 = new Hand(threeOfAKindPlayer2, threeOfAKindCommunity);
         Hand hand3 = new Hand(threeOfAKindPlayer3, threeOfAKindCommunity);
 
+        hand3.evaluate();
         ArrayList<Hand> hands = new ArrayList<Hand>();
         hands.add(hand1);
         hands.add(hand2);
         hands.add(hand3);
         Collections.sort(hands);
 
-        Assertions.assertEquals(hand3, hands.get(0));
+        Assertions.assertEquals(hand3, hands.get(2));
+        Assertions.assertEquals(hand2, hands.get(1));
+        Assertions.assertEquals(hand1, hands.get(0));
 
-        assertTrue(hand1.compareTo(hand2) > 0);
-        assertTrue(hand2.compareTo(hand3) > 0);
-        assertTrue(hand2.compareTo(hand1) < 0);
+        assertTrue(hand1.compareTo(hand2) < 0);
+        assertTrue(hand2.compareTo(hand3) < 0);
+        assertTrue(hand2.compareTo(hand1) > 0);
+        assertTrue(hand3.compareTo(hand2) > 0);
         Assertions.assertTrue(hand1.isThreeOfAKind());
         Assertions.assertTrue(hand2.isThreeOfAKind());
         Assertions.assertTrue(hand3.isThreeOfAKind());
@@ -154,18 +155,17 @@ class HandTest {
         hand1.evaluate();
         hand2.evaluate();
 
-        assertTrue(hand1.compareTo(hand2) > 0);
+        assertTrue(hand1.compareTo(hand2) < 0);
         Assertions.assertTrue(hand1.isFourOfAKind());
-        Assertions.assertTrue(hand1.isThreeOfAKind());
         Assertions.assertTrue(hand2.isFourOfAKind());
-        Assertions.assertTrue(hand2.isThreeOfAKind());
     }
 
     @Test
     void compareStraightFlush() {
-        // hand1 < hand2 < hand 3
+        // hand1 = hand2 < hand 3
         Hand hand1 = new Hand(straightFlushPlayer1, straightFlushCommunity1);
         Hand hand2 = new Hand(straightFlushPlayer1, straightFlushCommunity2);
+        // straight flush 7,6,5,4,3
         Hand hand3 = new Hand(straightFlushPlayer1, straightFlushCommunity3);
         Hand hand11 = new Hand(straightFlushPlayer1, straightFlushCommunity1);
         Hand hand22 = new Hand(straightFlushPlayer1, straightFlushCommunity2);
@@ -178,15 +178,16 @@ class HandTest {
         hands.add(hand3);
         Collections.sort(hands);
 
-        Assertions.assertEquals(hands.get(0), hand3);
+        Assertions.assertEquals(hand3, hands.get(2));
 
         Assertions.assertEquals(0, hand1.compareTo(hand11));
         Assertions.assertEquals(0, hand2.compareTo(hand22));
         Assertions.assertEquals(0, hand3.compareTo(hand33));
 
 
-        assertTrue(hand1.compareTo(hand3) > 0);
-        assertTrue(hand2.compareTo(hand3) > 0);
+        assertTrue(hand1.compareTo(hand3) < 0);
+        assertTrue(hand2.compareTo(hand3) < 0);
+        assertTrue(hand3.compareTo(hand1) > 0);
         Assertions.assertEquals(0, hand1.compareTo(hand2));
     }
 
@@ -202,6 +203,7 @@ class HandTest {
         hand1.evaluate();
         hand2.evaluate();
         hand3.evaluate();
+
         hand5.evaluate();
         hand6.evaluate();
         hand7.evaluate();

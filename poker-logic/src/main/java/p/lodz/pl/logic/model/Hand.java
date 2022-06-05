@@ -1,5 +1,6 @@
 package p.lodz.pl.logic.model;
 
+import org.jetbrains.annotations.NotNull;
 import p.lodz.pl.logic.comparators.RankComparator;
 import p.lodz.pl.logic.comparators.SuitComparator;
 import p.lodz.pl.logic.comparators.SuitRankComparator;
@@ -16,6 +17,10 @@ public class Hand implements Comparable<Hand> {
     private final RankComparator rankComparator = new RankComparator();
     private final Card[] cards;
 
+    // for flushes
+    private final int[] suitCardCount = new int[Suits.values().length];
+    // for straights
+    private final int[] rankCardCount = new int[Ranks.values().length];
 
     private boolean evaluated = false;
 
@@ -28,18 +33,20 @@ public class Hand implements Comparable<Hand> {
     private boolean twoPairs;
     private boolean pair;
     // the highest card in current composition
-    // ex. highest card in straight
+    // ex. the highest card in straight
     private Ranks highCard;
+    private Ranks secondHighCard;
 
+    // ------------------------------------- variables -------------------------------------
 
-    public Hand(Card[] playerCards, Card[] tableCards) {
+    public Hand(Card @NotNull [] playerCards, Card @NotNull [] tableCards) {
         cards = new Card[playerCards.length + tableCards.length];
         System.arraycopy(playerCards, 0, cards, 0, playerCards.length);
         System.arraycopy(tableCards, 0, cards, playerCards.length, tableCards.length);
         Arrays.sort(cards);
     }
 
-    public Hand(Card[]... cardArrays) {
+    public Hand(Card[] @NotNull ... cardArrays) {
         ArrayList<Card> cardList = new ArrayList<Card>();
         for (Card[] cards :
                 cardArrays) {
@@ -48,8 +55,9 @@ public class Hand implements Comparable<Hand> {
         cards = cardList.toArray(new Card[0]);
     }
 
+    // ------------------------------------- getters -------------------------------------
     public boolean isRoyalFlush() {
-        return isStraightFlush() && highCard.equals(Ranks.values()[0]);
+        return isStraightFlush() && highCard.equals(Ranks.values()[Ranks.values().length - 1]);
     }
 
     public boolean isStraightFlush() {
@@ -80,180 +88,55 @@ public class Hand implements Comparable<Hand> {
         return twoPairs;
     }
 
+    public boolean isPair() {
+        return pair;
+    }
+
     public Ranks getHighCard() {
         return highCard;
+    }
+
+    public Ranks getSecondHighCard() {
+        return secondHighCard;
     }
 
     public Card[] getCards() {
         return cards;
     }
 
+
+    // ------------------------------------- other functions -------------------------------------
     @Override
     public String toString() {
-        return "Hand{" +
+        return "\n\nHand{" +
                 "cards=" + Arrays.toString(cards) +
                 '}';
     }
 
-
-    public Ranks highCard() {
-        Arrays.sort(cards, rankComparator);
-        return cards[0].rank();
-    }
-
-    // TODO
-    private boolean isPair() {
-        return false;
-    }
-
-    // TODO
-    private boolean checkIfTwoPairs() {
-        return false;
-    }
-
-
-    // TODO
-    private boolean checkIfStraight() {
-        return false;
-    }
-
-    // TODO
-    private boolean checkIfFlush() {
-        Arrays.sort(cards, suitComparator);
-
-        return false;
-    }
-
-    // TODO
-    private boolean checkIfFullHouse() {
-        return false;
-    }
-
-    // check if hand contains ThreeOfAKind or FourOfAKind
-    // both assumptions are checked together for optimization
-    private void checkIfThreeOrFourOfAKind() {
-        Arrays.sort(cards, rankComparator);
-        int cardsInFourOfAKind = 1;
-        highCard = cards[0].rank();
-        Ranks threeOfAKindRank = highCard;
-
-        for (int i = 1; i < cards.length; i++) {
-
-            if (cards[i].rank().equals(highCard)) {
-                cardsInFourOfAKind++;
-                if (cardsInFourOfAKind == 3) {
-                    threeOfAKind = true;
-                    threeOfAKindRank = highCard;
-                }
-                if (cardsInFourOfAKind == 4) {
-                    fourOfAKind = true;
-                    return;
-                }
-            } else {
-                cardsInFourOfAKind = 1;
-                highCard = cards[i].rank();
-            }
-        }
-        fourOfAKind = false;
-
-        // if hand does not contain four of a kind, saved high card from threeOfAKind is brought back
-        if (threeOfAKind) {
-            highCard = threeOfAKindRank;
-        }
-
-    }
-
-
-    private void checkIfStraightFlush() {
-        Arrays.sort(cards, suitRankComparator);
-        Ranks[] ranks = Ranks.values();
-        Suits currentSuit;
-        int cardsInFlush = 0;
-
-        int rankStartIndex = 0;
-
-        // if there is a straight flush, cards will be next to each other after sorting
-        for (int i = 0; i < cards.length; i++) {
-            currentSuit = cards[i].suit();
-            highCard = cards[i].rank();
-            cardsInFlush = 1;
-
-            // next FLUSH_SIZE-1 cards must be one rank lower with the same suit
-            for (int j = 1; j < FLUSH_SIZE; j++) {
-
-
-                // we will be checking next card, so we must check if the current card is not the last one in array
-                if ((i + 1) != cards.length) {
-                    i++;
-                }
-
-                // checking if next card is one rank lower than current one and of the same suit
-                if ((highCard.compareTo(cards[i].rank()) == -j) && cards[i].suit().equals(currentSuit)) {
-                    cardsInFlush++;
-                    if (cardsInFlush == FLUSH_SIZE) {
-                        straightFlush = true;
-                        return;
-                    }
-                    // if it is the same rank and suit it means there is a duplicate card in flush and card is omitted
-                } else if ((cards[i].rank().equals(ranks[j - 1]) && cards[i].suit().equals(currentSuit))) {
-                    j--;
-
-                    // (in normal poker) if the last card is ace ex. 5, 4, 3, 2, ace
-                    // if the last card in ranks is the last card in flush
-                } else if (cardsInFlush == FLUSH_SIZE - 1) {
-                    // check if straight is from last cards
-                    // (in normal poker) check if the flush starts from 5
-                    if (highCard == ranks[ranks.length - FLUSH_SIZE + 1]) {
-                        // check if deck contains needed ace
-                        if (Arrays.asList(cards).contains(new Card(ranks[0], currentSuit))) {
-                            straightFlush = true;
-                            break;
-                        }
-                    }
-
-
-                } else {
-                    // if the straight does not continue, we go back one card
-                    if ((i + 1) != cards.length) {
-                        i--;
-                    }
-                    break;
-                }
-            }
+    private void countCards() {
+        for (Card card : cards) {
+            suitCardCount[card.suit().ordinal()]++;
+            rankCardCount[card.rank().ordinal()]++;
         }
     }
 
-    /**
-     * evaluate each possible combination
-     * evaluation stops when certain combination is reached
-     * ex. if a hand contains straight flush other lower combinations are not calculated
-     */
-    public void evaluate() {
-        if (!evaluated) {
-            checkIfStraightFlush();
-            if (!straightFlush) {
-                checkIfThreeOrFourOfAKind();
-                if (!fourOfAKind) {
-                    // more logic
-                }
-
-            }
-
-
-            evaluated = true;
-        }
-    }
+//    private int compareHighCards(Hand o) {
+//        return Integer.compare(o.getHighCard().compareTo(this.getHighCard()), 0);
+//    }
 
     private int compareHighCards(Hand o) {
-        return Integer.compare(this.getHighCard().compareTo(o.getHighCard()), 0);
+        return Integer.compare(this.getHighCard().ordinal(), o.getHighCard().ordinal());
     }
 
+    private int compareSecondaryHighCards(Hand o) {
+        return  Integer.compare(this.getSecondHighCard().ordinal(), o.getSecondHighCard().ordinal());
+    }
+
+
     @Override
-    public int compareTo(Hand o) {
+    public int compareTo(@NotNull Hand o) {
         o.evaluate();
         this.evaluate();
-
-        int compare = 0;
 
         if (straightFlush ^ o.isStraightFlush()) {
             // either this or o is straightFlush
@@ -265,7 +148,7 @@ public class Hand implements Comparable<Hand> {
 
             // either no straight flush in both hands or straight flush in both hands
         } else if (straightFlush) {
-            // in such case there can be more than one straight flush
+            // straight flush in both hands
             // then winner is which flush starts from higher ranked card
             return compareHighCards(o);
         }
@@ -280,18 +163,62 @@ public class Hand implements Comparable<Hand> {
                 return -1;
             }
             // either no four of a kind in both hands or four of a kind in both hands
-            // in such case there can be more than one four of a kind
         } else if (fourOfAKind) {
-            // in such case there can be more than one four of a kind flush
+            // four of a kind in both hands
             // then winner is which four of a kind that starts from higher ranked card
             return compareHighCards(o);
         }
 
-        // fullhouse
+        // checking for full-house
+        if (fullHouse ^ o.isFullHouse()) {
 
-        // flush
+            // either this or o is full-houses
+            if (fullHouse) {
+                return 1;
+            } else {
+                return -1;
+            }
+            // either no full-houses in both hands or full-houses in both hands
+        } else if (fullHouse) {
+            // two full-houses
+            // then winner is full-house that starts from higher ranked card
+            if (compareHighCards(o) == 0) {
+                // if high cards are equal, lower cards are checked
+                return compareSecondaryHighCards(o);
+            }
+        }
 
-        // straight
+        // checking for flush
+        if (flush ^ o.isFlush()) {
+
+            // either this or o is flush
+            if (flush) {
+                return 1;
+            } else {
+                return -1;
+            }
+            // either no flush in both hands or flush in both hands
+        } else if (flush) {
+            // two flushes in hands
+            // then winner is which flush that starts from higher ranked card
+            return compareHighCards(o);
+        }
+
+        // checking for straight
+        if (straight ^ o.isStraight()) {
+
+            // either this or o is straight
+            if (straight) {
+                return 1;
+            } else {
+                return -1;
+            }
+            // either no straight in both hands or straight in both hands
+        } else if (straight) {
+            // two straight in hands
+            // then winner is which straight that starts from higher ranked card
+            return compareHighCards(o);
+        }
 
 
         // checking for three of a kind
@@ -311,6 +238,224 @@ public class Hand implements Comparable<Hand> {
             return compareHighCards(o);
         }
 
-        return 0;
+        // checking for two pairs
+        if (twoPairs ^ o.isTwoPairs()) {
+
+            // either this or o is full-houses
+            if (twoPairs) {
+                return 1;
+            } else {
+                return -1;
+            }
+            // either no twoPairs in both hands or twoPairs in both hands
+        } else if (twoPairs) {
+            // two twoPairs
+            // then winner is twoPairs that starts from higher ranked card
+            if (compareHighCards(o) == 0) {
+                // if high cards are equal, lower cards are checked
+                return compareSecondaryHighCards(o);
+            }
+        }
+
+        // checking for pair
+        if (pair ^ o.isPair()) {
+
+            // either this or o is full-houses
+            if (pair) {
+                return 1;
+            } else {
+                return -1;
+            }
+            // either no twoPairs in both hands or twoPairs in both hands
+        } else if (pair) {
+            // two twoPairs
+            // then winner is pair with higher card
+            return compareHighCards(o);
+        }
+
+        // if no combinations, just compare high cards
+        return compareHighCards(o);
+    }
+
+    // ------------------------------------- checking card combinations -------------------------------------
+
+    public Ranks highCard() {
+        Arrays.sort(cards, rankComparator);
+        return cards[0].rank();
+    }
+
+
+    private void checkIfStraight() {
+        Arrays.sort(cards, rankComparator);
+        int straightCount = 1;
+        for (int i = 1; i < cards.length; i++) {
+            if (straightCount == 1) {
+                highCard = cards[i - 1].rank();
+            }
+            if (highCard.ordinal() - cards[i].rank().ordinal() == straightCount) {
+                straightCount++;
+            } else {
+
+                // if not duplicate, reset count
+                if (cards[i].rank().ordinal() != cards[i - 1].rank().ordinal()) {
+                    straightCount = 1;
+                }
+            }
+            if (straightCount == FLUSH_SIZE) {
+                straight = true;
+                return;
+            }
+            // only for 5,4,3,2 ace
+            if (straightCount == FLUSH_SIZE - 1) {
+                if (highCard == Ranks.values()[FLUSH_SIZE - 2]) {
+                    if (Arrays.stream(cards).anyMatch(c -> c.rank() == Ranks.values()[Ranks.values().length - 1])) {
+                        straight = true;
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+
+    private void checkIfFlush() {
+        for (int i = 0; i < Suits.values().length; i++) {
+            if (suitCardCount[i] >= FLUSH_SIZE) {
+                highCard = Ranks.values()[i];
+                flush = true;
+                return;
+            }
+        }
+    }
+
+
+    /**
+     * Checks for all possible pairs
+     */
+    private void countPairs() {
+
+        // check for four of a kind
+        for (int i = 0; i < rankCardCount.length; i++) {
+            if (rankCardCount[i] == 4) {
+                highCard = Ranks.values()[i];
+                fourOfAKind = true;
+                return;
+            }
+
+            if (rankCardCount[i] == 3) {
+                highCard = Ranks.values()[i];
+                threeOfAKind = true;
+                if (pair) {
+                    fullHouse = true;
+                }
+            }
+
+            if (rankCardCount[i] == 2) {
+                if (threeOfAKind) {
+                    // if we have a three we save the second-high card for full-house
+                    secondHighCard = Ranks.values()[i];
+                    fullHouse = true;
+                }
+
+                if (pair) {
+                    twoPairs = true;
+                    secondHighCard = Ranks.values()[i];
+                }
+
+                pair = true;
+                highCard = Ranks.values()[i];
+            }
+        }
+    }
+
+    private void checkIfStraightFlush() {
+        checkIfFlush();
+        checkIfStraight();
+        if (!(flush && straight)) {
+            straightFlush = false;
+            return;
+        }
+        Arrays.sort(cards, suitRankComparator);
+        Suits suit;
+        for (int i = 0; i < Suits.values().length; i++) {
+            if (suitCardCount[i] >= FLUSH_SIZE) {
+                suit = Suits.values()[i];
+                int straightCount = 1;
+                for (int j = 1; j < cards.length; j++) {
+
+                    // if not desired suit skip
+                    if (cards[j].suit() != suit) {
+                        continue;
+                    }
+                    if (straightCount == 1) {
+                        highCard = cards[j - 1].rank();
+                    }
+                    if (highCard.ordinal() - cards[j].rank().ordinal() == straightCount) {
+                        straightCount++;
+                    } else {
+
+                        // if not duplicate, reset count
+                        if (cards[j].rank().ordinal() != cards[j - 1].rank().ordinal()) {
+                            straightCount = 1;
+                        }
+                    }
+                    if (straightCount == FLUSH_SIZE) {
+                        straightFlush = true;
+                        return;
+                    }
+                    // only for 5,4,3,2 ace
+                    if (straightCount == FLUSH_SIZE - 1) {
+                        if (highCard == Ranks.values()[FLUSH_SIZE - 2]) {
+                            Card card = new Card(Ranks.values()[Ranks.values().length - 1], suit);
+                            if (Arrays.asList(cards).contains(card)) {
+                                straightFlush = true;
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+    /**
+     * evaluate each possible combination
+     * evaluation stops when certain combination is reached
+     * ex. if a hand contains straight flush other lower combinations are not checked
+     */
+    public void evaluate() {
+        if (!evaluated) {
+            countCards();
+            checkIfStraightFlush();
+            if (straightFlush) {
+                evaluated = true;
+                return;
+            }
+
+            countPairs();
+            if (fourOfAKind || fullHouse) {
+                evaluated = true;
+                return;
+            }
+
+//            checkIfFlush();
+            if (flush) {
+                evaluated = true;
+                return;
+            }
+
+//            checkIfStraight();
+            if (straight) {
+                evaluated = true;
+                return;
+            }
+
+
+            if (!(pair || twoPairs || threeOfAKind)) {
+                highCard = highCard();
+            }
+            evaluated = true;
+        }
     }
 }
