@@ -48,7 +48,7 @@ public class Commands extends ListenerAdapter {
             event.getChannel().sendMessage(deck.toString()).queue();
             File file = null;
             try {
-                file = generator.generateTable(deck.getCardDeck());
+                file = generator.generateTable(deck.getCardDeck(), 10);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

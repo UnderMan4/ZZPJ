@@ -8,19 +8,22 @@ import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 import java.util.Objects;
 
 public class ImageGenerator {
 
-    public File generateTable(List<Card> cards) throws IOException {
+    public File generateTable(List<Card> cards, int columns) throws IOException {
         BufferedImage image = readImage(cards.get(0));
         int height = image.getHeight();
         int width = image.getWidth();
+        int gap = width / 10;
+        int rows = (int) Math.ceil((double) cards.size() / columns);
 
         BufferedImage out = new BufferedImage(
-                width * cards.size() + (width / 10) * (cards.size() - 1),
-                height,
+                width * columns + (gap * (columns - 1)),
+                height * rows + (gap * (rows - 1)),
                 BufferedImage.TYPE_INT_ARGB
         );
 
@@ -30,11 +33,14 @@ public class ImageGenerator {
 
         for (int i = 0; i < cards.size(); i++) {
             card = readImage(cards.get(i));
-            if (i != 0) {
-                graphics.translate(width * 1.1, 0);
-            }
-            graphics.drawImage(card, null, 0, 0);
+            graphics.drawImage(
+                    card,
+                    i % columns * (width + gap),
+                    i / columns * (height + gap),
+                    null
+            );
         }
+
 
         File file = new File("table.png");
         ImageIO.write(out, "png", file);
