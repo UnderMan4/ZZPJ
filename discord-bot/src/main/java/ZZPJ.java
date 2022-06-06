@@ -31,11 +31,11 @@ public class ZZPJ  {
 
         System.out.println(deck);
 
-            try {
-                System.out.println(deck.draw());
-            } catch (NoCardsInDeck e) {
-                e.printStackTrace();
-            }
+        try {
+            System.out.println(deck.draw());
+        } catch (NoCardsInDeck e) {
+            e.printStackTrace();
+        }
 
 
     }

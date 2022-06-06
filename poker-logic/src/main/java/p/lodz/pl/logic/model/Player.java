@@ -9,16 +9,22 @@ import java.util.List;
 @Getter
 @Setter
 public class Player {
+
     private String name;
     private int playerChips;
-    private int bet;
+    private int currentBet;
     private Hand playerHand;
     private List<Card> playerCards;
 
-    public Player(String name, int playerChips, int bet, Hand playerHand) {
+    private boolean isDealer;
+    private boolean isSmallBlind;
+    private boolean isBigBlind;
+    private boolean isFold;
+
+    public Player(String name, int playerChips, int currentBet, Hand playerHand) {
         this.name = name;
         this.playerChips = playerChips;
-        this.bet = bet;
+        this.currentBet = currentBet;
         this.playerHand = playerHand;
         this.playerCards = new ArrayList<>();
     }
@@ -27,16 +33,35 @@ public class Player {
         return playerChips;
     }
 
+    public void fold() {
+        isFold = true;
+    }
+
+    public void call() {
+        playerChips -= currentBet;
+    }
+
+    public void raise(int raiseAmount) {
+        currentBet += raiseAmount;
+        playerChips -= currentBet;
+    }
+
+    public int allIn() {
+        int totalAmount = playerChips;
+        playerChips = 0;
+        return totalAmount;
+    }
+
     public void setPlayerChips(int playerChips) {
         this.playerChips = playerChips;
     }
 
     public int getBet() {
-        return bet;
+        return currentBet;
     }
 
-    public void setBet(int bet) {
-        this.bet = bet;
+    public void setBet(int currentBet) {
+        this.currentBet = currentBet;
     }
 
     public Hand getPlayerHand() {
@@ -63,12 +88,28 @@ public class Player {
         this.playerCards.add(newCard);
     }
 
+    public boolean isDealer() {
+        return isDealer;
+    }
+
+    public boolean isSmallBlind() {
+        return isSmallBlind;
+    }
+
+    public boolean isBigBlind() {
+        return isBigBlind;
+    }
+
+    public boolean isFold() {
+        return isFold;
+    }
+
     @Override
     public String toString() {
         return "Player{" +
                 "name='" + name + '\'' +
                 ", playerChips=" + playerChips +
-                ", bet=" + bet +
+                ", currentBet=" + currentBet +
                 ", playerHand=" + playerHand +
                 ", playerCards=" + playerCards +
                 '}';

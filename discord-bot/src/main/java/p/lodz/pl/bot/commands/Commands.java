@@ -14,6 +14,9 @@ import p.lodz.pl.logic.utils.ImageGenerator;
 import java.io.File;
 import java.io.IOException;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class Commands extends ListenerAdapter {
 
     @Getter
@@ -21,6 +24,7 @@ public class Commands extends ListenerAdapter {
 
     @Getter
     private final Table table;
+
 
     public Commands() {
         this.table = new Table();
@@ -60,6 +64,11 @@ public class Commands extends ListenerAdapter {
         }
 
         if (event.getMessage().getContentDisplay().equals("!join")) {
+            List<String> nicknames = table.getPlayersList().stream().map(Player::getName).toList();
+            if(nicknames.contains(event.getAuthor().getName())) {
+                event.getChannel().sendMessage("Juz jestes w grze!").queue();
+                return;
+            }
             Player player = new Player(event.getAuthor().getName(), 1000, 0, new Hand());
             try {
 //                check if player already joined
@@ -75,8 +84,71 @@ public class Commands extends ListenerAdapter {
         if (event.getMessage().getContentDisplay().equals("!start")) {
             event.getChannel().sendMessage("Rozpoczynamy gre!").queue();
             table.startGame();
+            event.getGuild().getMembers().stream().forEach(member -> {
+                for(Player player : table.getPlayersList()) {
+                    if(player.getName().equals(member.getUser().getName())) {
+                        member.getUser()
+                                .openPrivateChannel()
+                                .flatMap(privateChannel -> privateChannel.sendMessage(player.getPlayerCards().toString()))
+                                .queue();
+                    }
+                }
+            });
         }
+
     }
 
+//
+//    private void preFlopRound() {
+//        currentPlayerIndex = bigBlindIndex != playersList.size() - 1 ? bigBlindIndex + 1 : 0;
+//        int playerToActIndex = currentPlayerIndex;
+//
+//        log.info("**********Pre-flop round**********");
+//
+//        do {
+//            log.info("Current bet: " + currentBet);
+//            log.info("Round pot: " + roundPot);
+//            log.info("Player to act: " + playersList.get(playerToActIndex).getName());
+//
+//            if (playersList.get(currentPlayerIndex).isFold()) {
+//                System.out.println(playersList.get(currentPlayerIndex).getName() + " is folded");
+//                currentPlayerIndex = currentPlayerIndex != playersList.size() - 1 ? currentPlayerIndex + 1 : 0;
+//                continue;
+//            }
+//
+//            if(getAllFoldedPlayers() == playersList.size() - 1) {
+//                log.info("Player" + currentPlayerIndex + "wins the game!!");
+//                return;
+//            }
+//
+//            log.info("It's " + playersList.get(currentPlayerIndex).getName() + "'s turn");
+//            String option = scanner.nextLine();
+//
+//            if (option.equals("fold")) {
+//                log.info(playersList.get(currentPlayerIndex).getName() + " folded");
+//                playersList.get(currentPlayerIndex).fold();
+//            }
+//            if (option.equals("call")) {
+//                log.info(playersList.get(currentPlayerIndex).getName() + " called");
+//                playersList.get(currentPlayerIndex).setBet(currentBet);
+//                playersList.get(currentPlayerIndex).call();
+//                roundPot += currentBet;
+//            }
+//            if (option.equals("raise")) {
+//                log.info(playersList.get(currentPlayerIndex).getName() + " raised");
+//                currentBet += 20;
+//                playersList.get(currentPlayerIndex).raise(20);
+//                roundPot += currentBet;
+//                playerToActIndex = currentPlayerIndex;
+//            }
+//            currentPlayerIndex = currentPlayerIndex != playersList.size() - 1 ? currentPlayerIndex + 1 : 0;
+//
+//
+//        } while (playerToActIndex != currentPlayerIndex);
+//
+//        log.info("Pre flop round finished");
+//        totalPot += roundPot;
+//        roundPot = 0;
+//    }
 
 }

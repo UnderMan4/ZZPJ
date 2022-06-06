@@ -7,6 +7,9 @@ public interface DEFS {
     int COMMUNITY_CARDS_COUNT = 5;
     int MAX_PLAYERS = 2;
     int MIN_BET = 2;
+    int SMALL_BLIND = 1;
+    int BIG_BLIND = 2;
+
 
     // DO NOT CHANGE UNLESS YOU ADD MORE CARDS TO THE GAME
     int DECK_SIZE = Suits.values().length * Ranks.values().length;
