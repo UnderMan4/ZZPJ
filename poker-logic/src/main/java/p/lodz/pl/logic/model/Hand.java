@@ -120,16 +120,13 @@ public class Hand implements Comparable<Hand> {
         }
     }
 
-//    private int compareHighCards(Hand o) {
-//        return Integer.compare(o.getHighCard().compareTo(this.getHighCard()), 0);
-//    }
 
     private int compareHighCards(Hand o) {
         return Integer.compare(this.getHighCard().ordinal(), o.getHighCard().ordinal());
     }
 
     private int compareSecondaryHighCards(Hand o) {
-        return  Integer.compare(this.getSecondHighCard().ordinal(), o.getSecondHighCard().ordinal());
+        return Integer.compare(this.getSecondHighCard().ordinal(), o.getSecondHighCard().ordinal());
     }
 
 
@@ -186,6 +183,8 @@ public class Hand implements Comparable<Hand> {
                 // if high cards are equal, lower cards are checked
                 return compareSecondaryHighCards(o);
             }
+            // if high cards are not equal, winner is high card
+            return compareHighCards(o);
         }
 
         // checking for flush
@@ -255,6 +254,8 @@ public class Hand implements Comparable<Hand> {
                 // if high cards are equal, lower cards are checked
                 return compareSecondaryHighCards(o);
             }
+            // if high cards are not equal, winner is high card
+            return compareHighCards(o);
         }
 
         // checking for pair
@@ -341,28 +342,34 @@ public class Hand implements Comparable<Hand> {
                 fourOfAKind = true;
                 return;
             }
+        }
 
+        for (int i = 0; i < rankCardCount.length; i++) {
             if (rankCardCount[i] == 3) {
                 highCard = Ranks.values()[i];
                 threeOfAKind = true;
-                if (pair) {
-                    fullHouse = true;
-                }
+                break;
             }
+        }
 
+        for (int i = 0; i < rankCardCount.length; i++) {
             if (rankCardCount[i] == 2) {
                 if (threeOfAKind) {
                     // if we have a three we save the second-high card for full-house
                     secondHighCard = Ranks.values()[i];
                     fullHouse = true;
+                    break;
                 }
 
                 if (pair) {
                     twoPairs = true;
-                    secondHighCard = Ranks.values()[i];
+                    secondHighCard = highCard;
+                } else {
+                    pair = true;
                 }
-
-                pair = true;
+                // if not threeOfAKind, that means we can only have pairs here
+                // and because we are going from the lowest rank to the highest if a pair is hit then we save the high card
+                // if we have two pairs, the second pair rank is higher than current highCard rank, so we set current highCard to secondHighCard
                 highCard = Ranks.values()[i];
             }
         }
@@ -457,34 +464,5 @@ public class Hand implements Comparable<Hand> {
             }
             evaluated = true;
         }
-    }
-
-    public String checkHand() {
-        evaluate();
-        if (straightFlush) {
-            return "Straight Flush";
-        }
-        if (fourOfAKind) {
-            return "Four of a Kind";
-        }
-        if (fullHouse) {
-            return "Full House";
-        }
-        if (flush) {
-            return "Flush";
-        }
-        if (straight) {
-            return "Straight";
-        }
-        if (threeOfAKind) {
-            return "Three of a Kind";
-        }
-        if (twoPairs) {
-            return "Two Pairs";
-        }
-        if (pair) {
-            return "Pair";
-        }
-        return "High Card";
     }
 }
