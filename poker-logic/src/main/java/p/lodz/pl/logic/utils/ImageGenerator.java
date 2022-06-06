@@ -13,8 +13,34 @@ import java.util.Objects;
 
 public class ImageGenerator {
 
+    public BufferedImage generateTable(List<Card> cards) throws IOException {
+        BufferedImage image = readImage(cards.get(0));
+        int height = image.getHeight();
+        int width = image.getWidth();
 
-    public void generateHand(List<Card> cards) throws IOException {
+        BufferedImage out = new BufferedImage(
+                width * cards.size() + (width / 10) * (cards.size() - 1),
+                height,
+                BufferedImage.TYPE_INT_ARGB
+        );
+
+        Graphics2D graphics = out.createGraphics();
+
+        BufferedImage card;
+
+        for (int i = 0; i < cards.size(); i++) {
+            card = readImage(cards.get(i));
+            if (i != 0) {
+                graphics.translate(width * 1.1, 0);
+            }
+            graphics.drawImage(card, null, 0, 0);
+        }
+
+        return out;
+    }
+
+
+    public BufferedImage generateHand(List<Card> cards) throws IOException {
         BufferedImage image = readImage(cards.get(0));
         int height = image.getHeight();
         int width = image.getWidth();
@@ -76,12 +102,7 @@ public class ImageGenerator {
 
 
         genGraphics.dispose();
-        ImageIO.write(
-                trimmedImage(genImage), 
-                "PNG", 
-                new File("./gen.png")
-        );
-
+        return trimmedImage(genImage);
 
     }
 
