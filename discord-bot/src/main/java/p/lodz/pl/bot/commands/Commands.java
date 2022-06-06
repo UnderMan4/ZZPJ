@@ -25,6 +25,7 @@ public class Commands extends ListenerAdapter {
     @Getter
     private final Table table;
 
+        ImageGenerator generator = new ImageGenerator();
 
     public Commands() {
         this.table = new Table();
@@ -37,7 +38,6 @@ public class Commands extends ListenerAdapter {
             return;
         }
 
-        ImageGenerator generator = new ImageGenerator();
 
         StringBuilder builder = new StringBuilder();
         builder.append(event.getAuthor().getName()).append(": ")
@@ -48,13 +48,16 @@ public class Commands extends ListenerAdapter {
             event.getChannel().sendMessage(deck.toString()).queue();
             File file = null;
             try {
-                file = generator.generateHand(deck.getCardDeck());
+                file = generator.generateTable(deck.getCardDeck());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
             File finalFile = file;
+            
             event.getAuthor().openPrivateChannel()
-                    .flatMap(privateChannel -> privateChannel.sendMessage(deck.toString()).addFile(finalFile))
+                    .flatMap(privateChannel -> privateChannel
+                            .sendMessage(deck.toString())
+                            .addFile(finalFile))
                     .queue();
         }
 
