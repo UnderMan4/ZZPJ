@@ -9,6 +9,10 @@ import p.lodz.pl.logic.model.Deck;
 import p.lodz.pl.logic.model.Hand;
 import p.lodz.pl.logic.model.Player;
 import p.lodz.pl.logic.model.Table;
+import p.lodz.pl.logic.utils.ImageGenerator;
+
+import java.io.File;
+import java.io.IOException;
 
 public class Commands extends ListenerAdapter {
 
@@ -25,9 +29,11 @@ public class Commands extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
-        if(event.getAuthor().isBot()){
+        if (event.getAuthor().isBot()) {
             return;
         }
+
+        ImageGenerator generator = new ImageGenerator();
 
         StringBuilder builder = new StringBuilder();
         builder.append(event.getAuthor().getName()).append(": ")
@@ -36,8 +42,15 @@ public class Commands extends ListenerAdapter {
 
         if (event.getMessage().getContentDisplay().equals("!deck")) {
             event.getChannel().sendMessage(deck.toString()).queue();
+            File file = null;
+            try {
+                file = generator.generateHand(deck.getCardDeck());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            File finalFile = file;
             event.getAuthor().openPrivateChannel()
-                    .flatMap(privateChannel -> privateChannel.sendMessage(deck.toString()))
+                    .flatMap(privateChannel -> privateChannel.sendMessage(deck.toString()).addFile(finalFile))
                     .queue();
         }
 

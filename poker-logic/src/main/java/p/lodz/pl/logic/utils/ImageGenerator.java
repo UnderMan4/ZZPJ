@@ -13,7 +13,7 @@ import java.util.Objects;
 
 public class ImageGenerator {
 
-    public BufferedImage generateTable(List<Card> cards) throws IOException {
+    public File generateTable(List<Card> cards) throws IOException {
         BufferedImage image = readImage(cards.get(0));
         int height = image.getHeight();
         int width = image.getWidth();
@@ -36,11 +36,14 @@ public class ImageGenerator {
             graphics.drawImage(card, null, 0, 0);
         }
 
-        return out;
+        File file = new File("table.png");
+        ImageIO.write(out, "png", file);
+
+        return file;
     }
 
 
-    public BufferedImage generateHand(List<Card> cards) throws IOException {
+    public File generateHand(List<Card> cards) throws IOException {
         BufferedImage image = readImage(cards.get(0));
         int height = image.getHeight();
         int width = image.getWidth();
@@ -102,8 +105,9 @@ public class ImageGenerator {
 
 
         genGraphics.dispose();
-        return trimmedImage(genImage);
-
+        File file = new File("hand.png");
+        ImageIO.write(trimmedImage(genImage), "png", file);
+        return file;
     }
 
     public BufferedImage readImage(Card card) throws IOException {
