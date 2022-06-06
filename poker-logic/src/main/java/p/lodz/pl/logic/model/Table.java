@@ -1,5 +1,7 @@
 package p.lodz.pl.logic.model;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.java.Log;
 import p.lodz.pl.logic.exceptions.CannotJoinGame;
 import p.lodz.pl.logic.exceptions.NoCardsInDeck;
@@ -12,6 +14,8 @@ import java.util.Scanner;
 import static p.lodz.pl.logic.model.DEFS.*;
 
 @Log
+@Getter
+@Setter
 public class Table {
 
     List<Player> playersList = new ArrayList<Player>();
@@ -29,17 +33,7 @@ public class Table {
 
 
     public Table() {
-        try {
-            initGame();
-            startGame();
-            preFlopRound();
-            flopRound();
-            turnRound();
-            riverRound();
-        } catch (Exception e) {
-            log.severe(e.getMessage());
-        }
-
+        initGame();
     }
 
     public void initGame() {
@@ -47,21 +41,23 @@ public class Table {
         currentBet = 0;
         playersList.clear();
 
-        Player playerOne = new Player("playerOne", 1000, 0, new Hand());
-        Player playerTwo = new Player("playerTwo", 1000, 0, new Hand());
-        Player playerThree = new Player("playerThree", 1000, 0, new Hand());
-        Player playerFour = new Player("playerFour", 1000, 0, new Hand());
-
-        playersList.add(playerOne);
-        playersList.add(playerTwo);
-        playersList.add(playerThree);
-        playersList.add(playerFour);
+//        Player playerOne = new Player("playerOne", 1000, 0, new Hand());
+//        Player playerTwo = new Player("playerTwo", 1000, 0, new Hand());
+//        Player playerThree = new Player("playerThree", 1000, 0, new Hand());
+//        Player playerFour = new Player("playerFour", 1000, 0, new Hand());
+//
+//        playersList.add(playerOne);
+//        playersList.add(playerTwo);
+//        playersList.add(playerThree);
+//        playersList.add(playerFour);
     }
 
     public void joinGame(Player player) throws CannotJoinGame {
         if (playersList.size() < MAX_PLAYERS) {
             if (player.getPlayerChips() > MIN_BET) {
-                playersList.add(player);
+                if(!playersList.contains(player)) {
+                    playersList.add(player);
+                }
             } else {
                 throw new CannotJoinGame("Insufficient chips to join the game");
             }
@@ -71,7 +67,7 @@ public class Table {
     }
 
     public void startGame() {
-        if (playersList.size() > 1) {
+        if (playersList.size() >= 1) {
             for (Player player : playersList) {
                 try {
                     for (int i = 0; i < 2; i++) {
@@ -81,7 +77,6 @@ public class Table {
                 } catch (NoCardsInDeck e) {
                     e.printStackTrace();
                 }
-                System.out.println(player.getPlayerCards().toString());
             }
         }
         Random random = new Random();
@@ -101,14 +96,18 @@ public class Table {
 
         currentBet = BIG_BLIND;
 
-        log.info("Dealer: " + dealerIndex);
-        log.info("Small blind: " + smallBlindIndex);
-        log.info("Big blind: " + bigBlindIndex);
-        log.info("Current bet: " + currentBet);
+        log.info("Dealer: " + playersList.get(dealerIndex).getName());
     }
 
     public void game() {
-
+        try {
+            preFlopRound();
+            flopRound();
+            turnRound();
+            riverRound();
+        } catch (Exception e) {
+            log.severe(e.getMessage());
+        }
     }
 
     public void preFlopRound() {
@@ -350,7 +349,7 @@ public class Table {
         return communityCards.toString();
     }
 
-    private int getAllFoldedPlayers() {
+    public int getAllFoldedPlayers() {
         int count = 0;
         for (Player player : playersList) {
             if (player.isFold()) {

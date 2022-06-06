@@ -4,8 +4,6 @@ import net.dv8tion.jda.api.JDABuilder;
 import p.lodz.pl.bot.commands.Commands;
 import p.lodz.pl.logic.exceptions.NoCardsInDeck;
 import p.lodz.pl.logic.model.Deck;
-import p.lodz.pl.logic.model.Player;
-import p.lodz.pl.logic.model.Table;
 
 import javax.security.auth.login.LoginException;
 
@@ -20,25 +18,24 @@ public class ZZPJ  {
         System.out.println("Hello world");
         Deck deck = new Deck();
 
-//        try {
-//            JDABuilder builder = JDABuilder.createDefault(dotenv.get("TOKEN"));
-//            JDA jda = builder.build();
-//
-//            jda.addEventListener(new Commands());
-//            jda.awaitReady();
-//        } catch (InterruptedException | LoginException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            JDABuilder builder = JDABuilder.createDefault(dotenv.get("TOKEN"));
+            JDA jda = builder.build();
+
+            jda.addEventListener(new Commands());
+            jda.awaitReady();
+        } catch (InterruptedException | LoginException e) {
+            e.printStackTrace();
+        }
 
 
-        Table table = new Table();
-//        Player playerOne = new Player();
-//        Player playerTwo = new Player();
-            try {
-                System.out.println(deck.draw());
-            } catch (NoCardsInDeck e) {
-                e.printStackTrace();
-            }
+        System.out.println(deck);
+
+        try {
+            System.out.println(deck.draw());
+        } catch (NoCardsInDeck e) {
+            e.printStackTrace();
+        }
 
 
     }
