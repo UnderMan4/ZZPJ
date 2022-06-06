@@ -47,5 +47,5 @@ gradle-app.setting
 .idea
 
 # .env file
-discord-bot/.env
+.env
 .env
