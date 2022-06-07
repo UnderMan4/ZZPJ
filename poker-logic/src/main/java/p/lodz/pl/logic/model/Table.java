@@ -75,13 +75,15 @@ public class Table {
         Random random = new Random();
         dealerIndex = random.nextInt(playersList.size());
 
-
-        if (dealerIndex == playersList.size() - 1) {
+        if  (playersList.size() == 2){
             smallBlindIndex = 0;
             bigBlindIndex = 1;
         } else if (dealerIndex == playersList.size() - 2) {
             smallBlindIndex = playersList.size() - 1;
             bigBlindIndex = 0;
+        } else if (dealerIndex == playersList.size() - 1) {
+            smallBlindIndex = 0;
+            bigBlindIndex = 1;
         } else {
             smallBlindIndex = dealerIndex + 1;
             bigBlindIndex = dealerIndex + 2;
@@ -338,7 +340,12 @@ public class Table {
 //        }
 //    }
 
-    public String getCommunityCards() {
+
+    public List<Card> getCommunityCards() {
+        return communityCards;
+    }
+
+    public String getCommunityCardsToString() {
         return communityCards.toString();
     }
 

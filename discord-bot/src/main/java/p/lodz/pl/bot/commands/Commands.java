@@ -6,12 +6,15 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import p.lodz.pl.logic.exceptions.CannotJoinGame;
+import p.lodz.pl.logic.exceptions.NoCardsInDeck;
 import p.lodz.pl.logic.exceptions.NotEnoughPlayersException;
 import p.lodz.pl.logic.model.Deck;
 import p.lodz.pl.logic.model.Hand;
 import p.lodz.pl.logic.model.Player;
 import p.lodz.pl.logic.model.Table;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.List;
 
 import static p.lodz.pl.logic.model.DEFS.ROUNDS_COUNT;
@@ -115,6 +118,7 @@ public class Commands extends ListenerAdapter {
             }
             event.getChannel().sendMessage("Rozpoczynamy gre!").queue();
             isGameStarted = true;
+            isPreFlopRound = true;
             wasRaised = true;
             event.getGuild().getMembers().stream().forEach(member -> {
                 for (Player player : table.getPlayersList()) {
@@ -142,19 +146,22 @@ public class Commands extends ListenerAdapter {
 
         if (event.getMessage().getContentDisplay().equals("!fold") && isGameStarted) {
             if (!checkPlayer(event)) return;
+
             table.getPlayersList().get(currentPlayerIndex).setFold(true);
             event.getChannel().sendMessage("Gracz " + table.getPlayersList().get(currentPlayerIndex).getName() + " oddal karty").queue();
 
             previousPlayerIndex = currentPlayerIndex;
-            currentPlayerIndex = currentPlayerIndex != table.getPlayersList().size() - 1 ? bigBlindIndex + 1 : 0;
+            currentPlayerIndex = currentPlayerIndex != table.getPlayersList().size() - 1 ? currentPlayerIndex + 1 : 0;
 
-//            if (table.getPlayersList().stream().filter(player -> !player.isFold()).count() == 1) {
-//                event.getChannel().sendMessage("Koniec gry!").queue();
-//                event.getChannel().sendMessage("Wszyscy gracze oddali karty").queue(); // TODO
-//                isGameStarted = false;
-//                isGameInitiated = false;
-//                return;
-//            }
+            if (table.getPlayersList().stream().filter(player -> !player.isFold()).count() == 1) {
+                Player winner = table.getPlayersList().stream().filter(player -> !player.isFold()).findFirst().get();
+                event.getChannel().sendMessage("Koniec gry!").queue();
+                event.getChannel().sendMessage("Wszyscy gracze z wyjatkiem " + winner.getName() + " oddali karty").queue(); // TODO
+                event.getChannel().sendMessage("Wygrywa gracz: " + winner.getName()).queue(); // TODO
+                isGameStarted = false;
+                isGameInitiated = false;
+                return;
+            }
 
             checkIsTheRoundFinished(event);
             checkIsFold(event);
@@ -169,7 +176,7 @@ public class Commands extends ListenerAdapter {
             table.getPlayersList().get(currentPlayerIndex).call();
 
             previousPlayerIndex = currentPlayerIndex;
-            currentPlayerIndex = currentPlayerIndex != table.getPlayersList().size() - 1 ? bigBlindIndex + 1 : 0;
+            currentPlayerIndex = currentPlayerIndex != table.getPlayersList().size() - 1 ? currentPlayerIndex + 1 : 0;
 
             checkIsTheRoundFinished(event);
             checkIsFold(event);
@@ -209,7 +216,7 @@ public class Commands extends ListenerAdapter {
             playerToActIndex = currentPlayerIndex;
 
             previousPlayerIndex = currentPlayerIndex;
-            currentPlayerIndex = currentPlayerIndex != table.getPlayersList().size() - 1 ? bigBlindIndex + 1 : 0;
+            currentPlayerIndex = currentPlayerIndex != table.getPlayersList().size() - 1 ? currentPlayerIndex + 1 : 0;
 
             checkIsFold(event);
             event.getChannel().sendMessage("Kolej gracza: " + table.getPlayersList().get(currentPlayerIndex).getName()).queue();
@@ -225,8 +232,10 @@ public class Commands extends ListenerAdapter {
 
             event.getChannel().sendMessage("Gracz " + table.getPlayersList().get(currentPlayerIndex).getName() + " czeka.").queue();
             previousPlayerIndex = currentPlayerIndex;
-            currentPlayerIndex = currentPlayerIndex != table.getPlayersList().size() - 1 ? bigBlindIndex + 1 : 0;
+            currentPlayerIndex = currentPlayerIndex != table.getPlayersList().size() - 1 ? currentPlayerIndex + 1 : 0;
 
+
+            checkIsTheRoundFinished(event);
             checkIsFold(event);
             event.getChannel().sendMessage("Kolej gracza: " + table.getPlayersList().get(currentPlayerIndex).getName()).queue();
         }
@@ -300,10 +309,29 @@ public class Commands extends ListenerAdapter {
             }
             event.getChannel().sendMessage("Koniec rundy!").queue();
             wasRaised = false;
-            roundNumber++;
             previousPlayerIndex = currentPlayerIndex;
-            currentPlayerIndex = dealerIndex != table.getPlayersList().size() - 1 ? bigBlindIndex + 1 : 0;
+            currentPlayerIndex = dealerIndex != table.getPlayersList().size() - 1 ? dealerIndex + 1 : 0;
             playerToActIndex = currentPlayerIndex;
+            handleCards(event);
+
+            roundNumber++;
+        }
+    }
+
+    private void handleCards(@NotNull MessageReceivedEvent event) {
+        try {
+            if (roundNumber == 0) {
+                for(int i = 0; i < 3; i++) {
+                    table.getCommunityCards().add(table.getDeck().draw());
+                }
+                event.getChannel().sendMessage("Karty na stole:\n" + table.getCommunityCards().toString()).queue();
+
+                return;
+            }
+            table.getCommunityCards().add(table.getDeck().draw());
+            event.getChannel().sendMessage("Karty na stole:\n" + table.getCommunityCards().toString()).queue();
+        } catch (NoCardsInDeck e) {
+            event.getChannel().sendMessage(e.getMessage()).queue();
         }
     }
 
@@ -313,12 +341,13 @@ public class Commands extends ListenerAdapter {
         if (player.isFold()) {
             event.getChannel().sendMessage("Gracz " + player.getName() + " oddal karty - pomijanie gracza").queue();
             previousPlayerIndex = currentPlayerIndex;
-            currentPlayerIndex = currentPlayerIndex != table.getPlayersList().size() - 1 ? bigBlindIndex + 1 : 0;
+            currentPlayerIndex = currentPlayerIndex != table.getPlayersList().size() - 1 ? currentPlayerIndex + 1 : 0;
         }
     }
 
     // Checks whether calling Player is the same as current Player
     private boolean checkPlayer(@NotNull MessageReceivedEvent event) {
+        System.out.println(currentPlayerIndex);
         Player player = table.getPlayersList().get(currentPlayerIndex);
         if (!player.getName().equals(event.getAuthor().getName())) {
             event.getChannel().sendMessage("Poczekaj chwile " + event.getAuthor().getName() + ". Teraz kolej na gracza " + player.getName()).queue();
