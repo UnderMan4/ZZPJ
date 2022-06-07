@@ -1,8 +1,6 @@
 package p.lodz.pl.bot.commands;
 
-import lombok.Getter;
 import lombok.extern.java.Log;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -13,7 +11,6 @@ import p.lodz.pl.logic.model.*;
 import p.lodz.pl.logic.utils.ImageGenerator;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 import static p.lodz.pl.logic.model.DEFS.ROUNDS_COUNT;
@@ -21,11 +18,9 @@ import static p.lodz.pl.logic.model.DEFS.ROUNDS_COUNT;
 @Log
 public class Commands extends ListenerAdapter {
 
-    @Getter
     private final Deck deck;
-
-    @Getter
     private final Table table;
+    private final ImageGenerator generator;
 
     private int dealerIndex;
     private int smallBlindIndex;
@@ -43,50 +38,19 @@ public class Commands extends ListenerAdapter {
     private boolean isGameStarted;
     private boolean isGameInitiated;
     private boolean isGameFinished;
-    private boolean isPreFlopRound;
     private boolean wasRaised;
 
-    ImageGenerator generator = new ImageGenerator();
 
     public Commands() {
         this.table = new Table();
         this.deck = new Deck();
+        this.generator = new ImageGenerator();
     }
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         if (event.getAuthor().isBot()) {
             return;
-        }
-
-        if (event.getMessage().getContentDisplay().equals("!test")) {
-            List<Member> members = event.getGuild().getMembers();
-            event.getChannel().sendMessage("Members: " + members.size()).queue();
-            for (Member member : members) {
-                event.getChannel().sendMessage(member.getUser().getName()).queue();
-            }
-        }
-
-        StringBuilder builder = new StringBuilder();
-        builder.append(event.getAuthor().getName()).append(": ")
-                .append(event.getMessage().getContentDisplay());
-
-
-        if (event.getMessage().getContentDisplay().equals("!deck")) {
-            event.getChannel().sendMessage(deck.toString()).queue();
-            File file = null;
-            try {
-                file = generator.generateTable(deck.getCardDeck(), 10);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            File finalFile = file;
-
-            event.getAuthor().openPrivateChannel()
-                    .flatMap(privateChannel -> privateChannel
-                            .sendMessage(deck.toString())
-                            .addFile(finalFile))
-                    .queue();
         }
 
         //-----------------------------------------------COMMANDS USED BEFORE GAME-----------------------------------
@@ -100,6 +64,7 @@ public class Commands extends ListenerAdapter {
             event.getChannel().sendMessage("Rozpoczynamy gre! Uzyj polecenia !join aby dolaczyc do gry.").queue();
             table.initGame();
             isGameInitiated = true;
+            return;
         }
 
         if (event.getMessage().getContentDisplay().equals("!join") && isGameInitiated) {
@@ -122,6 +87,7 @@ public class Commands extends ListenerAdapter {
                 event.getChannel().sendMessage("Nie udalo sie dolaczyc do gry.").queue();
                 e.printStackTrace();
             }
+            return;
         }
 
         if (event.getMessage().getContentDisplay().equals("!start") && isGameInitiated) {
@@ -138,7 +104,6 @@ public class Commands extends ListenerAdapter {
             event.getChannel().sendMessage("Rozpoczynamy gre!").queue();
 
             isGameStarted = true;
-            isPreFlopRound = true;
             isGameFinished = false;
             wasRaised = true;
 
@@ -160,6 +125,7 @@ public class Commands extends ListenerAdapter {
             playerToActIndex = currentPlayerIndex;
 
             event.getChannel().sendMessage("Kolej gracza: " + table.getPlayersList().get(currentPlayerIndex).getName()).queue();
+            return;
         }
 
         //-----------------------------------------------COMMANDS USED DURING GAME-----------------------------------
@@ -170,9 +136,14 @@ public class Commands extends ListenerAdapter {
 
         if (event.getMessage().getContentDisplay().equals("!makao") && isGameStarted) {
             event.getChannel().sendMessage("Makao!").addFile(prepareUserCards(event.getAuthor().getName())).queue();
-            event.getChannel().sendMessage("https://youtu.be/BZkKgq7EyP8").queue();
+            event.getChannel().sendMessage("https://www.youtube.com/watch?v=BZkKgq7EyP8&t=28s").queue();
             isGameFinished = true;
         }
+
+        if (event.getMessage().getContentDisplay().equals("!bet") && isGameStarted) {
+            event.getChannel().sendMessage("Aktualna kwota zakladu: " + table.getCurrentBet()).queue();
+        }
+
 
         if (event.getMessage().getContentDisplay().equals("!rank") && isGameStarted) {
             Player player = table.getPlayersList()
@@ -183,6 +154,7 @@ public class Commands extends ListenerAdapter {
             event.getAuthor()
                     .openPrivateChannel()
                     .flatMap(privateChannel -> privateChannel.sendMessage(player.getPlayerHand().checkRank())).queue();
+            return;
         }
 
         if (event.getMessage().getContentDisplay().equals("!fold") && isGameStarted) {
@@ -209,6 +181,7 @@ public class Commands extends ListenerAdapter {
                 checkIsFold(event);
                 event.getChannel().sendMessage("Kolej gracza: " + table.getPlayersList().get(currentPlayerIndex).getName()).queue();
             }
+            return;
         }
 
         if (event.getMessage().getContentDisplay().equals("!call") && isGameStarted) {
@@ -231,6 +204,7 @@ public class Commands extends ListenerAdapter {
                 checkIsFold(event);
                 event.getChannel().sendMessage("Kolej gracza: " + table.getPlayersList().get(currentPlayerIndex).getName()).queue();
             }
+            return;
         }
 
         if (event.getMessage().getContentDisplay().contains("!raise") && isGameStarted) {
@@ -270,6 +244,7 @@ public class Commands extends ListenerAdapter {
 
             checkIsFold(event);
             event.getChannel().sendMessage("Kolej na gracza: " + table.getPlayersList().get(currentPlayerIndex).getName()).queue();
+            return;
         }
 
         if (event.getMessage().getContentDisplay().equals("!check") && isGameStarted) {

@@ -468,7 +468,6 @@ public class Hand implements Comparable<Hand> {
 
     public String checkRank() {
         evaluate();
-
         if (straightFlush) {
             return "Straight Flush";
         }
