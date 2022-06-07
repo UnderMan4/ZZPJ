@@ -55,6 +55,24 @@ public class Commands extends ListenerAdapter {
             return;
         }
 
+        if (event.getMessage().getContentDisplay().equals("!help")) {
+
+            EmbedBuilder helpEmbed = new EmbedBuilder();
+            helpEmbed.setTitle("PokerBOT | Help Menu:");
+            helpEmbed.setDescription("`!init` - utworz stol do gry w pokera\n" +
+                    "`!join` - dolacz do utworzonego stolu\n" +
+                    "`!start` - zacznij rozgrywke\n" +
+                    "`!bet` - wyswietl aktualna stawke\n" +
+                    "`!rank` - wyslij w wiadomosci prywatnej aktualna kompozycje\n" +
+                    "`!fold` - spasuj\n" +
+                    "`!call` - wyrownaj do stawki\n" +
+                    "`!raise` <value> - podbij stawke o dana wartosc\n" +
+                    "`!check` - sprawdz\n" +
+                    "`!rules` - wyswietla zasady gry\n" +
+                    "`!hands` - wyswietla  hierachie kombinacji pokerowych");
+            event.getChannel().sendMessageEmbeds(helpEmbed.build()).queue();
+        }
+
         //-----------------------------------------------COMMANDS USED BEFORE GAME-----------------------------------
 
         if (event.getMessage().getContentDisplay().equals("!init") && !isGameInitiated) {
