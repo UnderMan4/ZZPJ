@@ -7,9 +7,9 @@ import p.lodz.pl.logic.model.Deck;
 
 import javax.security.auth.login.LoginException;
 
-public class ZZPJ  {
+public class ZZPJ {
 
-    public static void main(String[] args)  {
+    public static void main(String[] args) {
 
         Dotenv dotenv = Dotenv.load();
         System.out.println(dotenv.get("TOKEN"));
