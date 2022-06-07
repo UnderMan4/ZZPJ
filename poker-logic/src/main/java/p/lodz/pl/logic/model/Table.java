@@ -18,8 +18,8 @@ import static p.lodz.pl.logic.model.DEFS.*;
 @Setter
 public class Table {
 
-    List<Player> playersList = new ArrayList<Player>();
-    List<Card> communityCards = new ArrayList<Card>(3);
+    List<Player> playersList = new ArrayList<>();
+    List<Card> communityCards = new ArrayList<>(3);
 
     private int currentBet;
     private int roundPot;
@@ -36,6 +36,12 @@ public class Table {
     public void initGame() {
         deck = new Deck();
         currentBet = 0;
+        roundPot = 0;
+        totalPot = 0;
+        dealerIndex = 0;
+        smallBlindIndex = 0;
+        bigBlindIndex = 0;
+        currentPlayerIndex = 0;
         playersList.clear();
     }
 
@@ -91,260 +97,8 @@ public class Table {
     }
 
 
-
-//    public void game() {
-//        try {
-//            preFlopRound();
-//            flopRound();
-//            turnRound();
-//            riverRound();
-//        } catch (Exception e) {
-//            log.severe(e.getMessage());
-//        }
-//    }
-
-//    public void preFlopRound() {
-//        Scanner scanner = new Scanner(System.in);
-//        currentPlayerIndex = bigBlindIndex != playersList.size() - 1 ? bigBlindIndex + 1 : 0;
-//        int playerToActIndex = currentPlayerIndex;
-//
-//        log.info("**********Pre-flop round**********");
-//
-//        do {
-//            log.info("Current bet: " + currentBet);
-//            log.info("Round pot: " + roundPot);
-//            log.info("Player to act: " + playersList.get(playerToActIndex).getName());
-//
-//            if (playersList.get(currentPlayerIndex).isFold()) {
-//                System.out.println(playersList.get(currentPlayerIndex).getName() + " is folded");
-//                currentPlayerIndex = currentPlayerIndex != playersList.size() - 1 ? currentPlayerIndex + 1 : 0;
-//                continue;
-//            }
-//
-//            if(getAllFoldedPlayers() == playersList.size() - 1) {
-//                log.info("Player" + currentPlayerIndex + "wins the game!!");
-//                return;
-//            }
-//
-//            log.info("It's " + playersList.get(currentPlayerIndex).getName() + "'s turn");
-//            String option = scanner.nextLine();
-//
-//            if (option.equals("fold")) {
-//                log.info(playersList.get(currentPlayerIndex).getName() + " folded");
-//                playersList.get(currentPlayerIndex).fold();
-//            }
-//            if (option.equals("call")) {
-//                log.info(playersList.get(currentPlayerIndex).getName() + " called");
-//                playersList.get(currentPlayerIndex).setBet(currentBet);
-//                playersList.get(currentPlayerIndex).call();
-//                roundPot += currentBet;
-//            }
-//            if (option.equals("raise")) {
-//                log.info(playersList.get(currentPlayerIndex).getName() + " raised");
-//                currentBet += 20;
-//                playersList.get(currentPlayerIndex).raise(20);
-//                roundPot += currentBet;
-//                playerToActIndex = currentPlayerIndex;
-//            }
-//            currentPlayerIndex = currentPlayerIndex != playersList.size() - 1 ? currentPlayerIndex + 1 : 0;
-//
-//
-//        } while (playerToActIndex != currentPlayerIndex);
-//
-//        log.info("Pre flop round finished");
-//        totalPot += roundPot;
-//        roundPot = 0;
-//    }
-//
-//    public void flopRound() throws NoCardsInDeck {
-//        Scanner scanner = new Scanner(System.in);
-//        currentPlayerIndex = dealerIndex != playersList.size() - 1 ? dealerIndex + 1 : 0;
-//        int playerToActIndex = currentPlayerIndex;
-//        boolean wasRaised = false;
-//
-//        communityCards.add(deck.draw());
-//        communityCards.add(deck.draw());
-//        communityCards.add(deck.draw());
-//
-//        log.info("**********Flop round**********");
-//
-//        do {
-//            log.info("Community cards: " + communityCards.toString());
-//
-//            log.info("Current bet: " + currentBet);
-//            log.info("Round pot: " + roundPot);
-//            log.info("Player to act: " + playersList.get(playerToActIndex).getName());
-//
-//            if (playersList.get(currentPlayerIndex).isFold()) {
-//                System.out.println(playersList.get(currentPlayerIndex).getName() + " is folded");
-//                currentPlayerIndex = currentPlayerIndex != playersList.size() - 1 ? currentPlayerIndex + 1 : 0;
-//                continue;
-//            }
-//
-//            if(getAllFoldedPlayers() == playersList.size() - 1) {
-//                log.info("Player" + currentPlayerIndex + "wins the game!!");
-//                return;
-//            }
-//
-//            String option = scanner.nextLine();
-//
-//            if (option.equals("fold")) {
-//                log.info(playersList.get(currentPlayerIndex).getName() + " folded");
-//                playersList.get(currentPlayerIndex).fold();
-//            }
-//            if (option.equals("check") && !wasRaised) {
-//                log.info(playersList.get(currentPlayerIndex).getName() + " checked");
-//            }
-//            if (option.equals("call") && wasRaised) {
-//                log.info(playersList.get(currentPlayerIndex).getName() + " called");
-//                playersList.get(currentPlayerIndex).setBet(currentBet);
-//                playersList.get(currentPlayerIndex).call();
-//                roundPot += currentBet;
-//            }
-//            if (option.equals("raise")) {
-//                log.info(playersList.get(currentPlayerIndex).getName() + " raised");
-//                currentBet += 20;
-//                playersList.get(currentPlayerIndex).raise(20);
-//                roundPot += currentBet;
-//                playerToActIndex = currentPlayerIndex;
-//                wasRaised = true;
-//            }
-//            currentPlayerIndex = currentPlayerIndex != playersList.size() - 1 ? currentPlayerIndex + 1 : 0;
-//
-//        } while (playerToActIndex != currentPlayerIndex);
-//    }
-//
-//    public void turnRound() throws NoCardsInDeck {
-//        Scanner scanner = new Scanner(System.in);
-//        currentPlayerIndex = dealerIndex != playersList.size() - 1 ? dealerIndex + 1 : 0;
-//        int playerToActIndex = currentPlayerIndex;
-//        boolean wasRaised = false;
-//
-//
-//        communityCards.add(deck.draw());
-//
-//        log.info("**********Turn round**********");
-//
-//        do {
-//            log.info("Community cards: " + communityCards.toString());
-//
-//            log.info("Current bet: " + currentBet);
-//            log.info("Round pot: " + roundPot);
-//            log.info("Player to act: " + playersList.get(playerToActIndex).getName());
-//
-//            if (playersList.get(currentPlayerIndex).isFold()) {
-//                System.out.println(playersList.get(currentPlayerIndex).getName() + " is folded");
-//                currentPlayerIndex = currentPlayerIndex != playersList.size() - 1 ? currentPlayerIndex + 1 : 0;
-//                continue;
-//            }
-//
-//            if(getAllFoldedPlayers() == playersList.size() - 1) {
-//                log.info("Player" + currentPlayerIndex + "wins the game!!");
-//                return;
-//            }
-//
-//            String option = scanner.nextLine();
-//
-//            if (option.equals("fold")) {
-//                log.info(playersList.get(currentPlayerIndex).getName() + " folded");
-//                playersList.get(currentPlayerIndex).fold();
-//            }
-//            if (option.equals("check") && !wasRaised) {
-//                log.info(playersList.get(currentPlayerIndex).getName() + " checked");
-//            }
-//            if (option.equals("call") && wasRaised) {
-//                log.info(playersList.get(currentPlayerIndex).getName() + " called");
-//                playersList.get(currentPlayerIndex).setBet(currentBet);
-//                playersList.get(currentPlayerIndex).call();
-//                roundPot += currentBet;
-//            }
-//            if (option.equals("raise")) {
-//                log.info(playersList.get(currentPlayerIndex).getName() + " raised");
-//                currentBet += 20;
-//                playersList.get(currentPlayerIndex).raise(20);
-//                roundPot += currentBet;
-//                playerToActIndex = currentPlayerIndex;
-//                wasRaised = true;
-//            }
-//            currentPlayerIndex = currentPlayerIndex != playersList.size() - 1 ? currentPlayerIndex + 1 : 0;
-//
-//        } while (playerToActIndex != currentPlayerIndex);
-//    }
-//
-//    public void riverRound() throws NoCardsInDeck {
-//        Scanner scanner = new Scanner(System.in);
-//        currentPlayerIndex = dealerIndex != playersList.size() - 1 ? dealerIndex + 1 : 0;
-//        int playerToActIndex = currentPlayerIndex;
-//        boolean wasRaised = false;
-//
-//
-//        communityCards.add(deck.draw());
-//
-//        log.info("**********River round**********");
-//
-//        do {
-//            log.info("Community cards: " + communityCards.toString());
-//
-//            log.info("Current bet: " + currentBet);
-//            log.info("Round pot: " + roundPot);
-//            log.info("Player to act: " + playersList.get(playerToActIndex).getName());
-//
-//            if (playersList.get(currentPlayerIndex).isFold()) {
-//                System.out.println(playersList.get(currentPlayerIndex).getName() + " is folded");
-//                currentPlayerIndex = currentPlayerIndex != playersList.size() - 1 ? currentPlayerIndex + 1 : 0;
-//                continue;
-//            }
-//
-//            if(getAllFoldedPlayers() == playersList.size() - 1) {
-//                log.info("Player" + currentPlayerIndex + " wins the game!!");
-//                return;
-//            }
-//
-//            String option = scanner.nextLine();
-//
-//            if (option.equals("fold")) {
-//                log.info(playersList.get(currentPlayerIndex).getName() + " folded");
-//                playersList.get(currentPlayerIndex).fold();
-//            }
-//            if (option.equals("check") && !wasRaised) {
-//                log.info(playersList.get(currentPlayerIndex).getName() + " checked");
-//            }
-//            if (option.equals("call") && wasRaised) {
-//                log.info(playersList.get(currentPlayerIndex).getName() + " called");
-//                playersList.get(currentPlayerIndex).setBet(currentBet);
-//                playersList.get(currentPlayerIndex).call();
-//                roundPot += currentBet;
-//            }
-//            if (option.equals("raise")) {
-//                log.info(playersList.get(currentPlayerIndex).getName() + " raised");
-//                currentBet += 20;
-//                playersList.get(currentPlayerIndex).raise(20);
-//                roundPot += currentBet;
-//                playerToActIndex = currentPlayerIndex;
-//                wasRaised = true;
-//            }
-//            currentPlayerIndex = currentPlayerIndex != playersList.size() - 1 ? currentPlayerIndex + 1 : 0;
-//
-//        } while (playerToActIndex != currentPlayerIndex);
-//
-//        for (Player player : playersList) {
-//            if(!player.isFold()) {
-//                continue;
-//            }
-//            player.setPlayerHand(new Hand(player.getPlayerCards().toArray(new Card[2]), communityCards.toArray(new Card[5])));
-//            player.getPlayerHand().evaluate();
-//            System.out.println(player.getName() + ": " + player.getPlayerHand().toString());
-//            System.out.println(player.getPlayerHand().checkHand());
-//        }
-//    }
-
-
     public List<Card> getCommunityCards() {
         return communityCards;
-    }
-
-    public String getCommunityCardsToString() {
-        return communityCards.toString();
     }
 
     public List<String> getPlayersNames() {
