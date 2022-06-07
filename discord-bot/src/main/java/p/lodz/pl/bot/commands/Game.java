@@ -2,7 +2,6 @@ package p.lodz.pl.bot.commands;
 
 import lombok.extern.java.Log;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -13,14 +12,12 @@ import p.lodz.pl.logic.model.*;
 import p.lodz.pl.logic.utils.ImageGenerator;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import static p.lodz.pl.logic.model.DEFS.ROUNDS_COUNT;
 
 @Log
-public class Commands extends ListenerAdapter {
+public class Game extends ListenerAdapter {
 
     private final Deck deck;
     private final Table table;
@@ -45,7 +42,7 @@ public class Commands extends ListenerAdapter {
     private boolean wasRaised;
 
 
-    public Commands() {
+    public Game() {
         this.table = new Table();
         this.deck = new Deck();
         this.generator = new ImageGenerator();
@@ -104,7 +101,6 @@ public class Commands extends ListenerAdapter {
 
         if (event.getMessage().getContentDisplay().contains("!hand")) {
             String hand = event.getMessage().getContentDisplay().split(" ")[1];
-
 
             List<Card> royalFlush = List.of(
                     new Card(Ranks.Ten, Suits.Clubs),
@@ -244,6 +240,7 @@ public class Commands extends ListenerAdapter {
             event.getChannel().sendMessageEmbeds(initEmbed.build()).queue();
             table.initGame();
             isGameInitiated = true;
+            table.whoWon();
             return;
         }
 
@@ -269,6 +266,7 @@ public class Commands extends ListenerAdapter {
                 joinEmbed.setDescription("Aktualna ilo\u015B\u0107 graczy: " + table.getPlayersList().size());
                 event.getChannel().sendMessageEmbeds(joinEmbed.build()).queue();
             } catch (CannotJoinGame e) {
+                joinEmbed.setTitle("B\u0142\u0105d");
                 joinEmbed.setDescription("Nie uda\u0142o sie do\u0142\u0105czy\u0107 do gry.");
                 event.getChannel().sendMessageEmbeds(joinEmbed.build()).queue();
                 e.printStackTrace();
@@ -287,15 +285,18 @@ public class Commands extends ListenerAdapter {
             try {
                 table.startGame();
             } catch (NotEnoughPlayersException e) {
+                startEmbed.setTitle("Nie mo\u017Cna uruchomi\u0107 gry");
                 startEmbed.setDescription("Zbyt ma\u0142a ilo\u015B\u0107 graczy: " + table.getPlayersList().size());
                 event.getChannel().sendMessageEmbeds(startEmbed.build()).queue();
                 return;
             }
 
 
+
             isGameStarted = true;
             isGameFinished = false;
             wasRaised = true;
+            roundNumber = 0;
 
             event.getGuild().getMembers().stream().forEach(member -> {
                 System.out.println(member.getUser().getName());
@@ -322,7 +323,6 @@ public class Commands extends ListenerAdapter {
 
 
             startEmbed.setTitle("Rozpoczynamy gr\u0119!");
-//            event.getChannel().sendMessageEmbeds(startEmbed.build()).queue();
             startEmbed.setDescription("Kolej gracza: " + table.getPlayersList().get(currentPlayerIndex).getName());
             event.getChannel().sendMessageEmbeds(startEmbed.build()).queue();
             return;
@@ -342,12 +342,35 @@ public class Commands extends ListenerAdapter {
             File file = new File(String.valueOf(prepareUserCards(event.getAuthor().getName())));
             makaoEmbed.setImage("attachment://table.png");
             event.getChannel().sendMessageEmbeds(makaoEmbed.build()).addFile(file, "table.png").queue();
+            event.getChannel().sendMessage("https://youtu.be/BZkKgq7EyP8?t=28").queue();
 
             isGameFinished = true;
         }
 
         if (event.getMessage().getContentDisplay().equals("!bet") && isGameStarted) {
-            event.getChannel().sendMessage("Aktualna kwota zak\u0142adu: " + table.getCurrentBet()).queue();
+            EmbedBuilder betEmbed = new EmbedBuilder();
+            betEmbed.setDescription("Aktualna stawka: " + table.getCurrentBet());
+            event.getChannel().sendMessageEmbeds(betEmbed.build()).queue();
+            return;
+        }
+
+        if (event.getMessage().getContentDisplay().equals("!stats") && isGameStarted) {
+            EmbedBuilder statsEmbed = new EmbedBuilder();
+            statsEmbed.setTitle("Twoje Statystyki");
+
+            String handInfo = table.getCommunityCards().size() != 0 ? "R\u0119ka: " + table.getPlayersList().get(currentPlayerIndex).getPlayerHand().checkHand() + "\n" : "";
+
+            statsEmbed.setDescription("Tw\u00F3j aktualny stan konta: " + table.getPlayersList().get(currentPlayerIndex).getPlayerChips() + "\n"
+                    + "Aktualna kwota zak\u0142adu: " + table.getCurrentBet() + "\n" +
+                    handInfo
+            );
+            File file = new File(String.valueOf(prepareUserCards(event.getAuthor().getName())));
+            statsEmbed.setImage("attachment://table.png");
+
+            event.getAuthor()
+                    .openPrivateChannel()
+                    .flatMap(privateChannel -> privateChannel.sendMessageEmbeds(statsEmbed.build())).queue();
+            return;
         }
 
 
@@ -359,7 +382,7 @@ public class Commands extends ListenerAdapter {
                     .get();
             event.getAuthor()
                     .openPrivateChannel()
-                    .flatMap(privateChannel -> privateChannel.sendMessage(player.getPlayerHand().checkRank())).queue();
+                    .flatMap(privateChannel -> privateChannel.sendMessage(player.getPlayerHand().checkHand())).queue();
             return;
         }
 
@@ -380,7 +403,7 @@ public class Commands extends ListenerAdapter {
                 Player winner = table.getPlayersList().stream().filter(player -> !player.isFold()).findFirst().get();
                 foldEmbed.setTitle("Koniec gry!");
 //                TODO te dwa przypadki
-                foldEmbed.setDescription("Wszyscy gracze z wyj\u0105tkiem " + winner.getName() + " oddali karty\nWygrywa gracz: \" + winner.getName()");
+                foldEmbed.setDescription("Wszyscy gracze z wyj\u0105tkiem " + winner.getName() + " oddali karty\nWygrywa gracz: " + winner.getName());
                 event.getChannel().sendMessageEmbeds(foldEmbed.build()).queue();
 
                 isGameStarted = false;
@@ -391,7 +414,7 @@ public class Commands extends ListenerAdapter {
             checkIsTheRoundFinished(event);
             if (!isGameFinished) {
                 checkIsFold(event);
-                foldEmbed.setDescription("Kolej gracza: " + table.getPlayersList().get(currentPlayerIndex).getName());
+                foldEmbed.setDescription("Kolej na gracza: " + table.getPlayersList().get(currentPlayerIndex).getName());
                 event.getChannel().sendMessageEmbeds(foldEmbed.build()).queue();
             }
             return;
@@ -419,7 +442,7 @@ public class Commands extends ListenerAdapter {
             checkIsTheRoundFinished(event);
             if (!isGameFinished) {
                 checkIsFold(event);
-                callEmbed.setDescription("Kolej gracza: " + table.getPlayersList().get(currentPlayerIndex).getName());
+                callEmbed.setDescription("Kolej na gracza: " + table.getPlayersList().get(currentPlayerIndex).getName());
                 event.getChannel().sendMessageEmbeds(callEmbed.build()).queue();
             }
             return;
@@ -467,7 +490,7 @@ public class Commands extends ListenerAdapter {
 
             checkIsFold(event);
 
-            raiseEmbed.setDescription("Kolej gracza: " + table.getPlayersList().get(currentPlayerIndex).getName());
+            raiseEmbed.setDescription("Kolej na gracza: " + table.getPlayersList().get(currentPlayerIndex).getName());
             event.getChannel().sendMessageEmbeds(raiseEmbed.build()).queue();
 
             return;
@@ -495,7 +518,7 @@ public class Commands extends ListenerAdapter {
             checkIsTheRoundFinished(event);
             if (!isGameFinished) {
                 checkIsFold(event);
-                checkEmbed.setDescription("Kolej gracza: " + table.getPlayersList().get(currentPlayerIndex).getName());
+                checkEmbed.setDescription("Kolej na gracza: " + table.getPlayersList().get(currentPlayerIndex).getName());
                 event.getChannel().sendMessageEmbeds(checkEmbed.build()).queue();
             }
         }
@@ -552,6 +575,14 @@ public class Commands extends ListenerAdapter {
                 isGameStarted = false;
                 isGameInitiated = false;
                 isGameFinished = true;
+                List<Player> winners = table.whoWon();
+                for (Player player : winners) {
+                    infoEmbed.setDescription("Gracz " + player.getName() + " wygral!");
+                    event.getChannel().sendMessageEmbeds(infoEmbed.build()).queue();
+                }
+                for (Player player : table.getPlayersList()) {
+                    event.getChannel().sendMessage("Gracz " + player.getName() + player.getPlayerHand().checkHand()).queue();
+                }
                 return;
             }
 
@@ -621,6 +652,16 @@ public class Commands extends ListenerAdapter {
             return false;
         }
         return true;
+    }
+
+    private String getRoundName(int roundNumber) {
+        return switch (roundNumber) {
+            case 0 -> "Preflop Round";
+            case 1 -> "Flop Round";
+            case 2 -> "Turn Round";
+            case 3 -> "River Round";
+            default -> "Round";
+        };
     }
 
 }

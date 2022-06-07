@@ -10,6 +10,7 @@ import p.lodz.pl.logic.exceptions.NotEnoughPlayersException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Handler;
 
 import static p.lodz.pl.logic.model.DEFS.*;
 
@@ -31,8 +32,6 @@ public class Table {
     private int bigBlindIndex;
     private int currentPlayerIndex;
 
-
-
     public void initGame() {
         deck = new Deck();
         currentBet = 0;
@@ -43,6 +42,7 @@ public class Table {
         bigBlindIndex = 0;
         currentPlayerIndex = 0;
         playersList.clear();
+        communityCards.clear();
     }
 
     public void joinGame(Player player) throws CannotJoinGame {
@@ -99,6 +99,26 @@ public class Table {
 
     public List<Card> getCommunityCards() {
         return communityCards;
+    }
+
+    public List<Player> whoWon() {
+        List<Player> winners = new ArrayList<>();
+        boolean hasAnyWinner = false;
+
+        try {
+            for (HandValues handValue : HandValues.values()) {
+                if (hasAnyWinner) break;
+                for (Player player : playersList) {
+                    if (handValue.getValue().equals(player.getPlayerHand().checkHand())) {
+                        winners.add(player);
+                        hasAnyWinner = true;
+                    }
+                }
+            }
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
+        return winners;
     }
 
     public List<String> getPlayersNames() {

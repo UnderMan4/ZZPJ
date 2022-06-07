@@ -466,8 +466,12 @@ public class Hand implements Comparable<Hand> {
         }
     }
 
-    public String checkRank() {
+    public String checkHand() {
         evaluate();
+
+        if(isRoyalFlush()) {
+            return "Royal Flush";
+        }
         if (straightFlush) {
             return "Straight Flush";
         }
