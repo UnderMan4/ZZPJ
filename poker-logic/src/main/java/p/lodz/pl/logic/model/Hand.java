@@ -465,4 +465,34 @@ public class Hand implements Comparable<Hand> {
             evaluated = true;
         }
     }
+
+    public String checkRank() {
+        evaluate();
+
+        if (straightFlush) {
+            return "Straight Flush";
+        }
+        if (fourOfAKind) {
+            return "Four of a Kind";
+        }
+        if (fullHouse) {
+            return "Full House";
+        }
+        if (flush) {
+            return "Flush";
+        }
+        if (straight) {
+            return "Straight";
+        }
+        if (threeOfAKind) {
+            return "Three of a Kind";
+        }
+        if (twoPairs) {
+            return "Two Pairs";
+        }
+        if (pair) {
+            return "Pair";
+        }
+        return "High Card";
+    }
 }
