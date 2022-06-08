@@ -71,6 +71,7 @@ public class Table {
                     e.printStackTrace();
                 }
             }
+
         } else {
             throw new NotEnoughPlayersException("Not enough players to start the game");
         }
@@ -90,15 +91,27 @@ public class Table {
             smallBlindIndex = dealerIndex + 1;
             bigBlindIndex = dealerIndex + 2;
         }
-
         currentBet = BIG_BLIND;
 
-        log.info("Dealer: " + playersList.get(dealerIndex).getName());
+        getPlayersList().get(smallBlindIndex).setPlayerChips(getPlayersList().get(smallBlindIndex).getPlayerChips() - SMALL_BLIND);
+        getPlayersList().get(bigBlindIndex).setPlayerChips(getPlayersList().get(bigBlindIndex).getPlayerChips() - BIG_BLIND);
+
+        getPlayersList().get(smallBlindIndex).setBet(SMALL_BLIND);
+        getPlayersList().get(bigBlindIndex).setBet(BIG_BLIND);
     }
 
 
     public List<Card> getCommunityCards() {
         return communityCards;
+    }
+
+    public Player getPlayerByName(String name) {
+        for (Player player : playersList) {
+            if (player.getName().equals(name)) {
+                return player;
+            }
+        }
+        return null;
     }
 
     public List<Player> whoWon() {
@@ -120,6 +133,7 @@ public class Table {
         }
         return winners;
     }
+
 
     public List<String> getPlayersNames() {
         List<String> playersNames = new ArrayList<>();

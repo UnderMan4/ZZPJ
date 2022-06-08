@@ -37,19 +37,10 @@ public class Player {
         isFold = true;
     }
 
-    public void call() {
-        playerChips -= currentBet;
-    }
-
-    public void raise(int raiseAmount) {
-        currentBet += raiseAmount;
-        playerChips -= currentBet;
-    }
-
-    public int allIn() {
-        int totalAmount = playerChips;
-        playerChips = 0;
-        return totalAmount;
+    public int call(int tableBet) {
+        int call = tableBet - currentBet;
+        playerChips -= call;
+        return call;
     }
 
     public void setPlayerChips(int playerChips) {

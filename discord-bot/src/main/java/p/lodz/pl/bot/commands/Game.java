@@ -14,7 +14,7 @@ import p.lodz.pl.logic.utils.ImageGenerator;
 import java.io.File;
 import java.util.List;
 
-import static p.lodz.pl.logic.model.DEFS.ROUNDS_COUNT;
+import static p.lodz.pl.logic.model.DEFS.*;
 
 @Log
 public class Game extends ListenerAdapter {
@@ -174,28 +174,17 @@ public class Game extends ListenerAdapter {
             );
 
             switch (hand) {
-                case "1" ->
-                        sendHandHelp(event, "Poker kr\u00F3lewski (Royal Flush)", "Najmocniejszy i tym samym najlepiej punktowany uk\u0142ad kart w pokerze. Sk\u0142ada si\u0119 na niego pi\u0119\u0107 kart w tym samym kolorze \u2014 as, kr\u00F3l, dama, walet i dziesi\u0105tka. Mo\u017Cliwo\u015Bci wyst\u0105pienia takiego u\u0142o\u017Cenia podczas jednej gry s\u0105 niewielkie, jest ich zaledwie 4.", royalFlush);
-                case "2" ->
-                        sendHandHelp(event, "Poker (Straight Flush)", "U\u0142o\u017Cenie kart znajduj\u0105ce si\u0119 w hierarchii nieco ni\u017Cej od pokera kr\u00F3lewskiego, ale wci\u0105\u017C b\u0119d\u0105ce bardzo dobrze punktowanym. Ten uk\u0142ad sk\u0142ada si\u0119 z pi\u0119ciu kart w tym samym kolorze, kt\u00F3rych warto\u015Bci nast\u0119puj\u0105 po sobie. Mog\u0105 by\u0107 to np. karty od dziesi\u0105tki do sz\u00F3stki w karo. Je\u015Bli w trakcie rozgrywki dw\u00F3ch uczestnik\u00F3w zaprezentuje ten uk\u0142ad w fazie wy\u0142o\u017Cenia kart, to wygrywa ta osoba, kt\u00F3rej karta jest wy\u017Csza. ", straightFlush);
-                case "3" ->
-                        sendHandHelp(event, "Kareta (Four of a Kind)", "Ten uk\u0142ad pokerowy sk\u0142ada si\u0119 z czterech kart o identycznej warto\u015Bci. Mog\u0105 to by\u0107 cztery dziesi\u0105tki, walety, kr\u00F3le lub jakiekolwiek inne figury. Je\u015Bli dw\u00F3ch graczy wy\u0142o\u017Cy na st\u00F3\u0142 taki uk\u0142ad, to wygrywa ten, kt\u00F3rego karty s\u0105 wy\u017Cej w hierarchii.", fourOfAKind);
-                case "4" ->
-                        sendHandHelp(event, "Full (Full House)", "Tworz\u0105 go trzy karty o bli\u017Aniaczej warto\u015Bci i kolejne dwie r\u00F3wnie\u017C o identycznych warto\u015Bciach. Mog\u0105 to by\u0107 np. trzy karty kr\u00F3li i dwie karty dziesi\u0105tek. Je\u015Bli dwie osoby maj\u0105 fulla w grze, wygrywa ten, kt\u00F3ry ma wy\u017Csze karty w tr\u00F3jce, je\u015Bli za\u015B tr\u00F3jk\u0119 u obu uczestnik\u00F3w gry tworz\u0105 te same karty, to zwyci\u0119zc\u0105 jest posiadacz wy\u017Cszej dw\u00F3jki.", fullHouse);
-                case "5" ->
-                        sendHandHelp(event, "Kolor (Flush)", "Pi\u0119\u0107 kart o tym samym kolorze, kt\u00F3rych warto\u015Bci s\u0105 przypadkowe, tworzy uk\u0142ad pokerowy zwany kolorem. Standardowo \u2014 zawsze wygrywa ten gracz, kt\u00F3rego kolor zawiera kart\u0119 wy\u017Csz\u0105 od kart przeciwnika.", flush);
-                case "6" ->
-                        sendHandHelp(event, "Strit (Straight)", "Sk\u0142ada si\u0119 na niego pi\u0119\u0107 kart w r\u00F3\u017Cnych kolorach, ale za to u\u0142o\u017Conych w kolejno\u015Bci. Mo\u017Ce to by\u0107 np. uk\u0142ad w pokerze stworzony z kr\u00F3la, damy, waleta, dziesi\u0105tki i dziewi\u0105tki. Zawsze wygrywa ten strit, kt\u00F3ry sk\u0142ada si\u0119 z kart znajduj\u0105cych si\u0119 wy\u017Cej w hierarchii. ", straight);
-                case "7" ->
-                        sendHandHelp(event, "Trojka (Three of a Kind)", "Trzy karty o takiej samej warto\u015Bci to tr\u00F3jka. Dwie kolejne karty trzymane na r\u0119ce s\u0105 w\u00F3wczas przypadkowe. Wygrywaj\u0105cym graczem jest zawsze ten b\u0119d\u0105cy w posiadaniu wy\u017Cszej tr\u00F3jki. ", threeOfAKind);
-                case "8" ->
-                        sendHandHelp(event, "Dwie pary (Two Pairs)", "Tutaj mamy do czynienia z uk\u0142adem, kt\u00F3ry sk\u0142ada si\u0119 z dw\u00F3ch par kart o takich samych warto\u015Bciach. Mog\u0105 to by\u0107 np. dwa kr\u00F3le i dwie dziesi\u0105tki.", twoPair);
-                case "9" ->
-                        sendHandHelp(event, "Jedna para (One Pair)", "Dwie z pi\u0119ciu kart trzymanych na r\u0119ce tworz\u0105 par\u0119 wtedy, gdy ich warto\u015B\u0107 jest taka sama. Mog\u0105 to by\u0107 np. dwa asy. ", onePair);
-                case "10" ->
-                        sendHandHelp(event, "Wysoka karta (High Card)", "To najni\u017Cszy z uk\u0142ad\u00F3w w pokerze. Ma on zastosowanie wtedy, kiedy \u017Caden z uczestnik\u00F3w gry nie posiada \u017Cadnego z uk\u0142ad\u00F3w, kt\u00F3re zosta\u0142y opisane powy\u017Cej. W\u00F3wczas wygrywa ten, kt\u00F3ry ma najwy\u017Csz\u0105 kart\u0119 ze wszystkich.", highCard);
-                default ->
-                        sendHandHelp(event, "Niepoprawny numer", "Wpisz `!hands` aby zobaczy\u0107 list\u0119 dost\u0119pnych opcji", null);
+                case "1" -> sendHandHelp(event, "Poker kr\u00F3lewski (Royal Flush)", "Najmocniejszy i tym samym najlepiej punktowany uk\u0142ad kart w pokerze. Sk\u0142ada si\u0119 na niego pi\u0119\u0107 kart w tym samym kolorze \u2014 as, kr\u00F3l, dama, walet i dziesi\u0105tka. Mo\u017Cliwo\u015Bci wyst\u0105pienia takiego u\u0142o\u017Cenia podczas jednej gry s\u0105 niewielkie, jest ich zaledwie 4.", royalFlush);
+                case "2" -> sendHandHelp(event, "Poker (Straight Flush)", "U\u0142o\u017Cenie kart znajduj\u0105ce si\u0119 w hierarchii nieco ni\u017Cej od pokera kr\u00F3lewskiego, ale wci\u0105\u017C b\u0119d\u0105ce bardzo dobrze punktowanym. Ten uk\u0142ad sk\u0142ada si\u0119 z pi\u0119ciu kart w tym samym kolorze, kt\u00F3rych warto\u015Bci nast\u0119puj\u0105 po sobie. Mog\u0105 by\u0107 to np. karty od dziesi\u0105tki do sz\u00F3stki w karo. Je\u015Bli w trakcie rozgrywki dw\u00F3ch uczestnik\u00F3w zaprezentuje ten uk\u0142ad w fazie wy\u0142o\u017Cenia kart, to wygrywa ta osoba, kt\u00F3rej karta jest wy\u017Csza. ", straightFlush);
+                case "3" -> sendHandHelp(event, "Kareta (Four of a Kind)", "Ten uk\u0142ad pokerowy sk\u0142ada si\u0119 z czterech kart o identycznej warto\u015Bci. Mog\u0105 to by\u0107 cztery dziesi\u0105tki, walety, kr\u00F3le lub jakiekolwiek inne figury. Je\u015Bli dw\u00F3ch graczy wy\u0142o\u017Cy na st\u00F3\u0142 taki uk\u0142ad, to wygrywa ten, kt\u00F3rego karty s\u0105 wy\u017Cej w hierarchii.", fourOfAKind);
+                case "4" -> sendHandHelp(event, "Full (Full House)", "Tworz\u0105 go trzy karty o bli\u017Aniaczej warto\u015Bci i kolejne dwie r\u00F3wnie\u017C o identycznych warto\u015Bciach. Mog\u0105 to by\u0107 np. trzy karty kr\u00F3li i dwie karty dziesi\u0105tek. Je\u015Bli dwie osoby maj\u0105 fulla w grze, wygrywa ten, kt\u00F3ry ma wy\u017Csze karty w tr\u00F3jce, je\u015Bli za\u015B tr\u00F3jk\u0119 u obu uczestnik\u00F3w gry tworz\u0105 te same karty, to zwyci\u0119zc\u0105 jest posiadacz wy\u017Cszej dw\u00F3jki.", fullHouse);
+                case "5" -> sendHandHelp(event, "Kolor (Flush)", "Pi\u0119\u0107 kart o tym samym kolorze, kt\u00F3rych warto\u015Bci s\u0105 przypadkowe, tworzy uk\u0142ad pokerowy zwany kolorem. Standardowo \u2014 zawsze wygrywa ten gracz, kt\u00F3rego kolor zawiera kart\u0119 wy\u017Csz\u0105 od kart przeciwnika.", flush);
+                case "6" -> sendHandHelp(event, "Strit (Straight)", "Sk\u0142ada si\u0119 na niego pi\u0119\u0107 kart w r\u00F3\u017Cnych kolorach, ale za to u\u0142o\u017Conych w kolejno\u015Bci. Mo\u017Ce to by\u0107 np. uk\u0142ad w pokerze stworzony z kr\u00F3la, damy, waleta, dziesi\u0105tki i dziewi\u0105tki. Zawsze wygrywa ten strit, kt\u00F3ry sk\u0142ada si\u0119 z kart znajduj\u0105cych si\u0119 wy\u017Cej w hierarchii. ", straight);
+                case "7" -> sendHandHelp(event, "Trojka (Three of a Kind)", "Trzy karty o takiej samej warto\u015Bci to tr\u00F3jka. Dwie kolejne karty trzymane na r\u0119ce s\u0105 w\u00F3wczas przypadkowe. Wygrywaj\u0105cym graczem jest zawsze ten b\u0119d\u0105cy w posiadaniu wy\u017Cszej tr\u00F3jki. ", threeOfAKind);
+                case "8" -> sendHandHelp(event, "Dwie pary (Two Pairs)", "Tutaj mamy do czynienia z uk\u0142adem, kt\u00F3ry sk\u0142ada si\u0119 z dw\u00F3ch par kart o takich samych warto\u015Bciach. Mog\u0105 to by\u0107 np. dwa kr\u00F3le i dwie dziesi\u0105tki.", twoPair);
+                case "9" -> sendHandHelp(event, "Jedna para (One Pair)", "Dwie z pi\u0119ciu kart trzymanych na r\u0119ce tworz\u0105 par\u0119 wtedy, gdy ich warto\u015B\u0107 jest taka sama. Mog\u0105 to by\u0107 np. dwa asy. ", onePair);
+                case "10" -> sendHandHelp(event, "Wysoka karta (High Card)", "To najni\u017Cszy z uk\u0142ad\u00F3w w pokerze. Ma on zastosowanie wtedy, kiedy \u017Caden z uczestnik\u00F3w gry nie posiada \u017Cadnego z uk\u0142ad\u00F3w, kt\u00F3re zosta\u0142y opisane powy\u017Cej. W\u00F3wczas wygrywa ten, kt\u00F3ry ma najwy\u017Csz\u0105 kart\u0119 ze wszystkich.", highCard);
+                default -> sendHandHelp(event, "Niepoprawny numer", "Wpisz `!hands` aby zobaczy\u0107 list\u0119 dost\u0119pnych opcji", null);
             }
 
 
@@ -210,8 +199,8 @@ public class Game extends ListenerAdapter {
                             `!init` - utw\u00F3rz st\u00F3\u0142 do gry w pokera
                             `!join` - do\u0142\u0105cz do utworzonego sto\u0142u
                             `!start` - zacznij rozgrywk\u0119
-                            `!bet` - wy\u015Bwietl aktualna stawk\u0119
-                            `!rank` - wy\u015Blij w wiadomo\u015Bci prywatnej aktualna kompozycje
+                            `!round` - wy\u015Bwietl aktualny stan rundy
+                            `!stats` - wy\u015Bwietl twoja aktualne statystyki
                             `!fold` - spasuj
                             `!call` - wyr\u00F3wnaj do stawki
                             `!raise <warto\u015B\u0107>` - podbij stawk\u0119 o dana warto\u015B\u0107
@@ -236,7 +225,8 @@ public class Game extends ListenerAdapter {
                 return;
             }
 
-            initEmbed.setDescription("Rozpoczynamy gre! U\u017Cyj polecenia `!join` aby do\u0142\u0105czy\u0107 do gry.");
+            initEmbed.setTitle("Rozpoczynamy gr\u0119!");
+            initEmbed.setDescription("U\u017Cyj polecenia `!join` aby do\u0142\u0105czy\u0107 do gry.");
             event.getChannel().sendMessageEmbeds(initEmbed.build()).queue();
             table.initGame();
             isGameInitiated = true;
@@ -259,8 +249,8 @@ public class Game extends ListenerAdapter {
                 return;
             }
 
-            Player player = new Player(event.getAuthor().getName(), 1000, 0, new Hand());
             try {
+                Player player = new Player(event.getAuthor().getName(), 1000, 0, new Hand());
                 table.joinGame(player);
                 joinEmbed.setTitle("Gracz " + event.getAuthor().getName() + " do\u0142\u0105czy\u0142 do gry");
                 joinEmbed.setDescription("Aktualna ilo\u015B\u0107 graczy: " + table.getPlayersList().size());
@@ -291,8 +281,6 @@ public class Game extends ListenerAdapter {
                 return;
             }
 
-
-
             isGameStarted = true;
             isGameFinished = false;
             wasRaised = true;
@@ -321,6 +309,13 @@ public class Game extends ListenerAdapter {
             currentPlayerIndex = table.getCurrentPlayerIndex();
             playerToActIndex = currentPlayerIndex;
 
+            table.setRoundPot(SMALL_BLIND + BIG_BLIND);
+            table.setTotalPot(table.getRoundPot());
+            table.setCurrentBet(BIG_BLIND);
+
+            System.out.println("Dealer: " + table.getPlayersList().get(dealerIndex).getName());
+            System.out.println("Small blind: " + table.getPlayersList().get(smallBlindIndex).getName());
+            System.out.println("Big blind: " + table.getPlayersList().get(bigBlindIndex).getName());
 
             startEmbed.setTitle("Rozpoczynamy gr\u0119!");
             startEmbed.setDescription("Kolej gracza: " + table.getPlayersList().get(currentPlayerIndex).getName());
@@ -338,19 +333,22 @@ public class Game extends ListenerAdapter {
 
             EmbedBuilder makaoEmbed = new EmbedBuilder();
             makaoEmbed.setTitle("Makao!");
-            makaoEmbed.setDescription("https://youtu.be/BZkKgq7EyP8");
             File file = new File(String.valueOf(prepareUserCards(event.getAuthor().getName())));
             makaoEmbed.setImage("attachment://table.png");
             event.getChannel().sendMessageEmbeds(makaoEmbed.build()).addFile(file, "table.png").queue();
             event.getChannel().sendMessage("https://youtu.be/BZkKgq7EyP8?t=28").queue();
-
             isGameFinished = true;
+            return;
         }
 
-        if (event.getMessage().getContentDisplay().equals("!bet") && isGameStarted) {
-            EmbedBuilder betEmbed = new EmbedBuilder();
-            betEmbed.setDescription("Aktualna stawka: " + table.getCurrentBet());
-            event.getChannel().sendMessageEmbeds(betEmbed.build()).queue();
+        if (event.getMessage().getContentDisplay().equals("!round") && isGameStarted) {
+            EmbedBuilder roundEmbed = new EmbedBuilder();
+            roundEmbed.setTitle("Runda: " + getRoundName(roundNumber));
+            roundEmbed.setDescription("Totalna kwota do wygrania: " + table.getTotalPot() + "$\n" +
+                    "Kwota na rund\u0119: " + table.getRoundPot() + "$\n" +
+                    "Aktualna stawka: " + table.getCurrentBet() + "$\n" +
+                    "Aktualny gracz: " + table.getPlayersList().get(currentPlayerIndex).getName());
+            event.getChannel().sendMessageEmbeds(roundEmbed.build()).queue();
             return;
         }
 
@@ -358,10 +356,12 @@ public class Game extends ListenerAdapter {
             EmbedBuilder statsEmbed = new EmbedBuilder();
             statsEmbed.setTitle("Twoje Statystyki");
 
-            String handInfo = table.getCommunityCards().size() != 0 ? "R\u0119ka: " + table.getPlayersList().get(currentPlayerIndex).getPlayerHand().checkHand() + "\n" : "";
+            Player player = table.getPlayerByName(event.getAuthor().getName());
 
-            statsEmbed.setDescription("Tw\u00F3j aktualny stan konta: " + table.getPlayersList().get(currentPlayerIndex).getPlayerChips() + "\n"
-                    + "Aktualna kwota zak\u0142adu: " + table.getCurrentBet() + "\n" +
+            String handInfo = table.getCommunityCards().size() != 0 ? "R\u0119ka: " + player.getPlayerHand().checkHand() + "\n" : "";
+
+            statsEmbed.setDescription("Tw\u00F3j aktualny stan konta: " + player.getPlayerChips() + "$\n"
+                    + "Aktualna kwota zak\u0142adu: " + table.getCurrentBet() + "$\n" +
                     handInfo
             );
             File file = new File(String.valueOf(prepareUserCards(event.getAuthor().getName())));
@@ -373,19 +373,6 @@ public class Game extends ListenerAdapter {
             return;
         }
 
-
-        if (event.getMessage().getContentDisplay().equals("!rank") && isGameStarted) {
-            Player player = table.getPlayersList()
-                    .stream()
-                    .filter(p -> p.getName().equals(event.getAuthor().getName()))
-                    .findFirst()
-                    .get();
-            event.getAuthor()
-                    .openPrivateChannel()
-                    .flatMap(privateChannel -> privateChannel.sendMessage(player.getPlayerHand().checkHand())).queue();
-            return;
-        }
-
         if (event.getMessage().getContentDisplay().equals("!fold") && isGameStarted) {
             EmbedBuilder foldEmbed = new EmbedBuilder();
 
@@ -393,7 +380,7 @@ public class Game extends ListenerAdapter {
 
             table.getPlayersList().get(currentPlayerIndex).setFold(true);
 
-            foldEmbed.setDescription("Gracz " + table.getPlayersList().get(currentPlayerIndex).getName() + " oddal karty");
+            foldEmbed.setDescription("Gracz " + table.getPlayersList().get(currentPlayerIndex).getName() + " odda\u0142 karty");
             event.getChannel().sendMessageEmbeds(foldEmbed.build()).queue();
 
             previousPlayerIndex = currentPlayerIndex;
@@ -402,8 +389,9 @@ public class Game extends ListenerAdapter {
             if (table.getPlayersList().stream().filter(player -> !player.isFold()).count() == 1) {
                 Player winner = table.getPlayersList().stream().filter(player -> !player.isFold()).findFirst().get();
                 foldEmbed.setTitle("Koniec gry!");
-//                TODO te dwa przypadki
-                foldEmbed.setDescription("Wszyscy gracze z wyj\u0105tkiem " + winner.getName() + " oddali karty\nWygrywa gracz: " + winner.getName());
+                foldEmbed.setDescription("Wszyscy gracze z wyj\u0105tkiem " + winner.getName()
+                        + " oddali karty\nWygrywa gracz: " + winner.getName()
+                + "Wygra\u0142: " + table.getTotalPot() + "$");
                 event.getChannel().sendMessageEmbeds(foldEmbed.build()).queue();
 
                 isGameStarted = false;
@@ -431,10 +419,22 @@ public class Game extends ListenerAdapter {
                 return;
             }
 
-            callEmbed.setDescription("Gracz " + table.getPlayersList().get(currentPlayerIndex).getName() + " wyr\u00F3wna\u0142 zak\u0142ad. Stawka wynosi: " + table.getCurrentBet());
+            Player player = table.getPlayerByName(event.getAuthor().getName());
+            if (player.getPlayerChips() < table.getCurrentBet()) {
+                callEmbed.setDescription("Nie mo\u017Cesz wyr\u00F3wna\u0107 zak\u0142adu, poniewa\u017C nie masz tyle pieni\u0119dzy");
+                event.getChannel().sendMessageEmbeds(callEmbed.build()).queue();
+                return;
+            }
+
+            callEmbed.setTitle("Gracz " + table.getPlayersList().get(currentPlayerIndex).getName() + " wyr\u00F3wna\u0142 zak\u0142ad.");
+            callEmbed.setDescription("Aktualna stawka wynosi: " + table.getCurrentBet() + "$");
             event.getChannel().sendMessageEmbeds(callEmbed.build()).queue();
-            table.getPlayersList().get(currentPlayerIndex).setBet(table.getCurrentBet());
-            table.getPlayersList().get(currentPlayerIndex).call();
+
+            int call = player.call(table.getCurrentBet());
+            player.setBet(table.getCurrentBet());
+
+            table.setRoundPot(table.getRoundPot() + call);
+            table.setTotalPot(table.getTotalPot() + call);
 
             previousPlayerIndex = currentPlayerIndex;
             currentPlayerIndex = currentPlayerIndex != table.getPlayersList().size() - 1 ? currentPlayerIndex + 1 : 0;
@@ -442,6 +442,7 @@ public class Game extends ListenerAdapter {
             checkIsTheRoundFinished(event);
             if (!isGameFinished) {
                 checkIsFold(event);
+                callEmbed.clear();
                 callEmbed.setDescription("Kolej na gracza: " + table.getPlayersList().get(currentPlayerIndex).getName());
                 event.getChannel().sendMessageEmbeds(callEmbed.build()).queue();
             }
@@ -454,23 +455,24 @@ public class Game extends ListenerAdapter {
             if (!checkPlayer(event)) return;
 
             int amount;
+            Player player = table.getPlayerByName(event.getAuthor().getName());
 
             try {
                 String value = event.getMessage().getContentDisplay().split(" ")[1];
                 amount = Integer.parseInt(value);
 
-
-                if (amount > table.getPlayersList().get(currentPlayerIndex).getPlayerChips()) {
-                    raiseEmbed.setDescription("Nie masz wystarczaj\u0105cej liczby pieni\u0119dzy do obstawienia!");
+                if (amount < 0) {
+                    raiseEmbed.setDescription("Nie mo\u017Cesz podbi\u0107 zak\u0142adu o ujemnej warto\u015Bci");
                     event.getChannel().sendMessageEmbeds(raiseEmbed.build()).queue();
                     return;
                 }
 
-                if (amount <= table.getCurrentBet()) {
-                    raiseEmbed.setDescription("Nie mo\u017Cesz obstawi\u0107 mniejszej stawki!");
+                if (amount + table.getCurrentBet() > player.getPlayerChips()) {
+                    raiseEmbed.setDescription("Nie masz wystarczaj\u0105cej liczby pieni\u0119dzy do podniesienia stawki!");
                     event.getChannel().sendMessageEmbeds(raiseEmbed.build()).queue();
                     return;
                 }
+
 
             } catch (Exception e) {
                 raiseEmbed.setDescription("Podano niepoprawna kwot\u0119");
@@ -479,9 +481,15 @@ public class Game extends ListenerAdapter {
             }
 
             table.setCurrentBet(table.getCurrentBet() + amount);
+            table.setTotalPot(table.getTotalPot() + table.getCurrentBet());
+
+            player.call(table.getCurrentBet());
+            player.setBet(table.getCurrentBet());
+
             wasRaised = true;
-            raiseEmbed.setDescription("Gracz " + table.getPlayersList().get(currentPlayerIndex).getName()
-                    + " podni\u00F3s\u0142 stawk\u0119 o " + amount + ". Stawka wynosi: " + table.getCurrentBet());
+            raiseEmbed.setTitle("Gracz " + player.getName()
+                    + " podni\u00F3s\u0142 stawk\u0119 o " + amount + "$");
+            raiseEmbed.setDescription("Aktualna stawka wynosi: " + table.getCurrentBet() + "$");
             event.getChannel().sendMessageEmbeds(raiseEmbed.build()).queue();
             playerToActIndex = currentPlayerIndex;
 
@@ -490,6 +498,7 @@ public class Game extends ListenerAdapter {
 
             checkIsFold(event);
 
+            raiseEmbed.clear();
             raiseEmbed.setDescription("Kolej na gracza: " + table.getPlayersList().get(currentPlayerIndex).getName());
             event.getChannel().sendMessageEmbeds(raiseEmbed.build()).queue();
 
@@ -529,11 +538,7 @@ public class Game extends ListenerAdapter {
 
     // Send cards to user
     private File prepareUserCards(String name) {
-        Player player = table.getPlayersList()
-                .stream()
-                .filter(p -> p.getName().equals(name))
-                .findFirst()
-                .get();
+        Player player = table.getPlayerByName(name);
         try {
             File file = generator.generateTable(player.getPlayerCards(), player.getPlayerCards().size());
             return file;
@@ -577,12 +582,17 @@ public class Game extends ListenerAdapter {
                 isGameFinished = true;
                 List<Player> winners = table.whoWon();
                 for (Player player : winners) {
-                    infoEmbed.setDescription("Gracz " + player.getName() + " wygral!");
+                    infoEmbed.setTitle("Zwyci\u0119\u017Ca gracz " + player.getName());
+                    infoEmbed.setDescription("Kt\u00F3ry wygra\u0142 " + table.getTotalPot() / winners.size() + "$");
                     event.getChannel().sendMessageEmbeds(infoEmbed.build()).queue();
                 }
+                infoEmbed.setTitle("R\u0119ce wszystkich graczy");
+                StringBuilder sb = new StringBuilder();
                 for (Player player : table.getPlayersList()) {
-                    event.getChannel().sendMessage("Gracz " + player.getName() + player.getPlayerHand().checkHand()).queue();
+                    sb.append("Gracz ").append(player.getName()).append(": ").append(player.getPlayerHand().checkHand()).append("\n");
                 }
+                infoEmbed.setDescription(sb.toString());
+                event.getChannel().sendMessageEmbeds(infoEmbed.build()).queue();
                 return;
             }
 
@@ -592,8 +602,12 @@ public class Game extends ListenerAdapter {
             previousPlayerIndex = currentPlayerIndex;
             currentPlayerIndex = dealerIndex != table.getPlayersList().size() - 1 ? dealerIndex + 1 : 0;
             playerToActIndex = currentPlayerIndex;
+            table.setRoundPot(0);
+            table.setCurrentBet(0);
             handleCommunityCards(event);
-
+            for (Player player : table.getPlayersList()) {
+                player.setBet(0);
+            }
             roundNumber++;
         }
     }
@@ -643,12 +657,10 @@ public class Game extends ListenerAdapter {
 
     // Checks whether calling Player is the same as current Player
     private boolean checkPlayer(@NotNull MessageReceivedEvent event) {
-        System.out.println(currentPlayerIndex);
         Player player = table.getPlayersList().get(currentPlayerIndex);
         if (!player.getName().equals(event.getAuthor().getName())) {
             infoEmbed.setDescription("Poczekaj chwil\u0119 <@" + event.getAuthor().getId() + ">. Teraz kolej na gracza " + player.getName());
             event.getChannel().sendMessageEmbeds(infoEmbed.build()).queue();
-//            event.getChannel().sendMessage("Poczekaj chwile <@" + event.getAuthor().getId() + ">. Teraz kolej na gracza " + player.getName()).queue();
             return false;
         }
         return true;
@@ -656,11 +668,11 @@ public class Game extends ListenerAdapter {
 
     private String getRoundName(int roundNumber) {
         return switch (roundNumber) {
-            case 0 -> "Preflop Round";
-            case 1 -> "Flop Round";
-            case 2 -> "Turn Round";
-            case 3 -> "River Round";
-            default -> "Round";
+            case 0 -> "Preflop";
+            case 1 -> "Flop";
+            case 2 -> "Turn";
+            case 3 -> "River";
+            default -> "Runda";
         };
     }
 
