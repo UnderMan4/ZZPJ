@@ -12,6 +12,8 @@ import p.lodz.pl.logic.model.*;
 import p.lodz.pl.logic.utils.ImageGenerator;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import static p.lodz.pl.logic.model.DEFS.*;
@@ -211,6 +213,18 @@ public class Game extends ListenerAdapter {
                                     """
             );
             event.getChannel().sendMessageEmbeds(helpEmbed.build()).queue();
+        }
+        
+        if (event.getMessage().getContentDisplay().equals("!test")){
+            URI resource = null;
+            try {
+                resource = getClass().getResource("/ja nie testuje.mp4").toURI();
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
+            
+            File file = new File(resource);
+            event.getChannel().sendMessage("Prawdziwi programi\u015Bci niczego nie testuj\u0105!!!").addFile(file).queue();
         }
 
         //-----------------------------------------------COMMANDS USED BEFORE GAME-----------------------------------
