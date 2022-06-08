@@ -301,7 +301,6 @@ public class Game extends ListenerAdapter {
             roundNumber = 0;
 
             event.getGuild().getMembers().stream().forEach(member -> {
-                System.out.println(member.getUser().getName());
                 EmbedBuilder privateMessageEmbed = new EmbedBuilder();
                 for (Player player : table.getPlayersList()) {
                     privateMessageEmbed.setTitle("Twoje karty:");
@@ -327,9 +326,9 @@ public class Game extends ListenerAdapter {
             table.setTotalPot(table.getRoundPot());
             table.setCurrentBet(BIG_BLIND);
 
-            System.out.println("Dealer: " + table.getPlayersList().get(dealerIndex).getName());
-            System.out.println("Small blind: " + table.getPlayersList().get(smallBlindIndex).getName());
-            System.out.println("Big blind: " + table.getPlayersList().get(bigBlindIndex).getName());
+            log.info("Dealer: " + table.getPlayersList().get(dealerIndex).getName());
+            log.info("Small blind: " + table.getPlayersList().get(smallBlindIndex).getName());
+            log.info("Big blind: " + table.getPlayersList().get(bigBlindIndex).getName());
 
             startEmbed.setTitle("Rozpoczynamy gr\u0119!");
             startEmbed.setDescription("Kolej gracza: " + table.getPlayersList().get(currentPlayerIndex).getName());
